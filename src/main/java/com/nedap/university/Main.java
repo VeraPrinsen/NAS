@@ -5,7 +5,9 @@ public class Main {
     private static boolean keepAlive = true;
     private static boolean running = false;
 
-    private Main() {}
+    private Main() {
+
+    }
 
     public static void main(String[] args) {
         running = true;
@@ -46,6 +48,7 @@ public class Main {
                 }
             }
         };
+
         Runtime.getRuntime().addShutdownHook(shutdownThread);
     }
 }
