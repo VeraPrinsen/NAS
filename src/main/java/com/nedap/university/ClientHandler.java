@@ -18,7 +18,7 @@ public class ClientHandler implements Runnable {
     }
 
     public void run() {
-        byte[] sendData = new byte[1024];
+        byte[] sendData = new byte[1024 * 63];
         String capitalizedSentence = "CHECKV2: " + message.toUpperCase();
         sendData = capitalizedSentence.getBytes();
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, sourceIP, sourcePort);

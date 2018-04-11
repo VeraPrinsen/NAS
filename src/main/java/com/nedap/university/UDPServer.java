@@ -24,7 +24,7 @@ class UDPServer {
     public void start() throws Exception
     {
         while(true) {
-            byte[] receiveData = new byte[1024];
+            byte[] receiveData = new byte[1024 * 63];
 
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);

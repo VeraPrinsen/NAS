@@ -1,0 +1,14 @@
+package filewriter;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
+public class FileWriter {
+
+    public static void byteArrayToFile(byte[] bArray, String outputFilename) throws Exception {
+        OutputStream out = new FileOutputStream(outputFilename);
+        out.write(bArray);
+        out.close();
+    }
+}
