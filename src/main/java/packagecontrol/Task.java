@@ -2,15 +2,17 @@ package packagecontrol;
 
 public class Task implements Runnable {
 
-    private byte taskNo;
-    private byte sequenceNo;
+    private int taskNo;
 
-    public Task(byte taskNo) {
+    public Task(int taskNo) {
         this.taskNo = taskNo;
-        sequenceNo = 1;
     }
 
     public void run() {
 
+    }
+
+    public int getTaskNo() {
+        return taskNo;
     }
 }

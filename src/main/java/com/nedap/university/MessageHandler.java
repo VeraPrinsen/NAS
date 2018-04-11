@@ -1,11 +1,7 @@
 package com.nedap.university;
 
-import general.HeaderInfo;
+import general.Info;
 import packagecontrol.ByteMessage;
-
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.util.Arrays;
 
 public class MessageHandler implements Runnable {
 
@@ -18,24 +14,35 @@ public class MessageHandler implements Runnable {
     }
 
     public void run() {
-        // SEND ACK
+        if (!(message.getCommand().equals(Info.ACK_OK) || message.getCommand().equals(Info.ACK_DENIED))) {
+            // If the command was not an ACK_OK or ACK_DENIED, send Ack
+            CommandHandler.sendAck(message, server);
+        }
 
         // DO SOMETHING
         switch (message.getCommand()) {
-            case HeaderInfo.DOWNLOAD:
+            case Info.DOWNLOAD:
                 CommandHandler.download();
                 break;
 
-            case HeaderInfo.UPLOAD:
+            case Info.UPLOAD:
                 CommandHandler.upload();
                 break;
 
-            case HeaderInfo.PAUSE:
+            case Info.PAUSE:
                 CommandHandler.pause();
                 break;
 
-            case HeaderInfo.SENDDATA:
+            case Info.RESUME:
+                CommandHandler.resume();
+                break;
+
+            case Info.SENDDATA:
                 CommandHandler.senddata();
+                break;
+
+            case Info.FINAL:
+                CommandHandler.finaldata();
                 break;
 
             default:

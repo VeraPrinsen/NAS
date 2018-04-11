@@ -1,7 +1,7 @@
 package client;
 
-import filewriter.FileWriterClass;
-import general.HeaderInfo;
+import fileoperators.FileWriterClass;
+import general.Info;
 import general.Host;
 import java.io.*;
 import java.net.DatagramPacket;
@@ -9,15 +9,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+// Client doesn't listen to the Server, only gets expected responses?
 class Client extends Host {
 
     private ClientTUI clientTUI;
-    private Thread clientTUIThread;
 
     public Client() {
         this.clientTUI = new ClientTUI();
-        this.clientTUIThread = new Thread(clientTUI);
-        clientTUIThread.start();
+        clientTUI.run();
     }
 
     public static void main(String[] args) {
@@ -54,7 +53,7 @@ class Client extends Host {
 
         if (sendData.length <= (1024*63)) {
             // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, HeaderInfo.DEFAULT_PORT);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Info.DEFAULT_PORT);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);
@@ -101,7 +100,7 @@ class Client extends Host {
 
         if (sendData.length <= (1024*63)) {
             // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, HeaderInfo.DEFAULT_PORT);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Info.DEFAULT_PORT);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);

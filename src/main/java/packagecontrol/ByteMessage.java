@@ -1,5 +1,8 @@
 package packagecontrol;
 
+import general.Info;
+import general.Methods;
+
 import java.net.InetAddress;
 import java.util.Arrays;
 
@@ -13,11 +16,10 @@ public class ByteMessage {
     private int sourcePort;
 
     public ByteMessage(byte[] message, InetAddress sourceIP, int sourcePort) {
-        this.command = new String(Arrays.copyOfRange(message,0, 1));
-        this.taskNo = (int) message[2];
-        this.sequenceNo = (int) message[3];
-        this.data = Arrays.copyOfRange(message,4, message.length-1);
-
+        this.command = new String(Arrays.copyOfRange(message, Info.FIRSTINDEX_COMMAND, Info.LASTINDEX_COMMAND));
+        this.taskNo = Methods.byteArrayToInt(Arrays.copyOfRange(message, Info.FIRSTINDEX_TASK, Info.LASTINDEX_TASK));
+        this.sequenceNo = Methods.byteArrayToInt(Arrays.copyOfRange(message, Info.FIRSTINDEX_SEQUENCE, Info.LASTINDEX_SEQUENCE));
+        this.data = Arrays.copyOfRange(message,Info.FIRSTINDEX_DATA, message.length-1);
         this.sourceIP = sourceIP;
         this.sourcePort = sourcePort;
     }

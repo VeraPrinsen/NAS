@@ -12,6 +12,7 @@ public class Host {
 
     private DatagramSocket hostSocket;
     private List<String> expectedAcks;
+    // een lijst waarin de taskNo's worden opgeslagen
 
     public Host () {
         expectedAcks = new ArrayList<>();
@@ -30,13 +31,13 @@ public class Host {
         }
     }
 
-    public boolean getAck(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
+    public boolean hasAck(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
         String requestedAck = getAckString(sourceIP, sourcePort, taskNo, sequenceNo);
         return expectedAcks.contains(requestedAck);
     }
 
     private String getAckString(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
-        return sourceIP.toString() + HeaderInfo.DELIMITER + sourcePort + HeaderInfo.DELIMITER + taskNo + HeaderInfo.DELIMITER + sequenceNo;
+        return sourceIP.toString() + Info.DELIMITER + sourcePort + Info.DELIMITER + taskNo + Info.DELIMITER + sequenceNo;
     }
 
     public void send(DatagramPacket datagramPacket) {

@@ -3,7 +3,7 @@ package testpackage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class TestByteString {
+public class TestByteBitString {
 
     public static void main(String[] args) {
         String stringA = "Hallo ik ben een test ";

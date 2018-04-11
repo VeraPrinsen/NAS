@@ -1,17 +1,21 @@
 package client;
 
-import filereader.FileReaderClass;
+import fileoperators.FileReaderClass;
 
-public class ServerHandler implements Runnable {
+public class ClientInputHandler implements Runnable {
 
     private String message;
 
-    public ServerHandler(String message) {
+    public ClientInputHandler(String message) {
         this.message = message;
     }
 
     public void run() {
         switch (message) {
+            case "HELP":
+                CommandHandler.help();
+                break;
+
             case "Send1":
                 try {
                     Client.sendFixedBytes();
@@ -41,7 +45,7 @@ public class ServerHandler implements Runnable {
                 break;
 
             default:
-                System.out.println("Unknown command");
+                //CommandHandler.defaultsend(client);
 
         }
     }

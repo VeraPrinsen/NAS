@@ -1,31 +1,20 @@
 package packagecontrol;
 
-import general.HeaderInfo;
+import general.Info;
 import general.Methods;
 import general.Host;
-import java.io.IOException;
+
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 public class SendPacket implements Runnable {
 
     private Host host;
-    private InetAddress destinationIP;
-    private int destinationPort;
-    private String command;
-    private int taskNo;
-    private int sequenceNo;
-    private byte[] data;
+    BytePacket packet;
 
-    public SendPacket(Host host, InetAddress destinationIP, int destinationPort, String command, int taskNo, int sequenceNo, byte[] data) {
+    public SendPacket(Host host, BytePacket packet) {
         this.host = host;
-        this.destinationIP = destinationIP;
-        this.destinationPort = destinationPort;
-        this.command = command;
-        this.taskNo = taskNo;
-        this.sequenceNo = sequenceNo;
-        this.data = data;
+        this.packet = packet;
     }
 
     // TO DO: SEND DATA
@@ -41,41 +30,47 @@ public class SendPacket implements Runnable {
     }
 
     private DatagramPacket createPacket() {
-        int nBytes = HeaderInfo.HEADERSIZE + data.length;
+        int nBytes = Info.HEADERSIZE + packet.getData().length;
 
-        byte[] bCommand = command.getBytes();
-        byte[] bTask = new byte[1]; bTask[0] = (byte) taskNo;
-        System.out.println(taskNo + " / " + bTask);
-        byte[] bSequence = new byte[1]; bSequence[0] = (byte) sequenceNo;
-        System.out.println(taskNo + " / " + bTask);
-        byte[] sendData = Methods.concat(Methods.concat(Methods.concat(bCommand, bTask),bSequence), data);
+        byte[] bCommand = packet.getCommand().getBytes();
+        byte[] bTask = Methods.intToByteArray(packet.getTaskNo(), Info.TASKSIZE);
+        byte[] bSequence = Methods.intToByteArray(packet.getSequenceNo(), Info.SEQUENCESIZE);
 
-        DatagramPacket sendPacket = null;
+        byte[] sendData = Methods.concat(Methods.concat(Methods.concat(bCommand, bTask),bSequence), packet.getData());
+
+        DatagramPacket packet = null;
         if (nBytes == sendData.length) {
-            sendPacket = new DatagramPacket(sendData, sendData.length, destinationIP, destinationPort);
+            packet = new DatagramPacket(sendData, sendData.length, this.packet.getDestinationIP(), this.packet.getDestinationPort());
             System.out.println("Packet succesfully made");
         } else {
             System.out.println("Expected size: " + nBytes + ", Real size: " + sendData.length);
         }
-        return sendPacket;
+        return packet;
     }
 
-    private int sendPacket(DatagramPacket packet) {
-        int nRetransmissions = 0;
+    private int sendPacket(DatagramPacket datagramPacket) {
+        int nTransmissions = 0;
         boolean ackReceived = false;
 
         while (!ackReceived) {
-            host.send(packet);
-            nRetransmissions++;
+            host.send(datagramPacket);
+            nTransmissions++;
+            long startTime = System.currentTimeMillis();
+            long endTime = startTime + Info.TIMEOUT;
 
-            // CHECK FOR ACKS
-
-
-
-
+            while (System.currentTimeMillis() < endTime) {
+                if (host.hasAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo())) {
+                    host.removeAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo());
+                    ackReceived = true;
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        return nRetransmissions;
-
+        return nTransmissions;
     }
 }

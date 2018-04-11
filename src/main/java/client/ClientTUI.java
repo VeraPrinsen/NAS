@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
  * @author vera.prinsen
  *
  */
-public class ClientTUI implements Runnable {
+public class ClientTUI {
 	
 	private BufferedReader in;
 
@@ -23,8 +23,8 @@ public class ClientTUI implements Runnable {
 		try {
 			msg = in.readLine();
 			while (msg != null) {
-				System.out.println("Your message: " + msg);
-				(new Thread(new ServerHandler(msg))).start();
+				print("Your message: " + msg);
+				(new Thread(new ClientInputHandler(msg))).start();
 				msg = in.readLine();
 			}
 		} catch (IOException e) {
