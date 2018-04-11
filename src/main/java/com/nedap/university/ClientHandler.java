@@ -5,12 +5,12 @@ import java.net.InetAddress;
 
 public class ClientHandler implements Runnable {
 
-    private String message;
+    private byte[] message;
     private InetAddress sourceIP;
     private int sourcePort;
     private UDPServer server;
 
-    public ClientHandler(String message, InetAddress sourceIP, int sourcePort, UDPServer server) {
+    public ClientHandler(byte[] message, InetAddress sourceIP, int sourcePort, UDPServer server) {
         this.message = message;
         this.sourceIP = sourceIP;
         this.sourcePort = sourcePort;
@@ -18,9 +18,10 @@ public class ClientHandler implements Runnable {
     }
 
     public void run() {
-        byte[] sendData = new byte[1024 * 63];
-        String capitalizedSentence = "CHECKV2: " + message.toUpperCase();
-        sendData = capitalizedSentence.getBytes();
+        byte[] sendData = message;
+        // String capitalizedSentence = "CHECKV2: " + message.toUpperCase();
+        //System.out.println("TO CLIENT: " + sendData.length + " bytes: " + new String(sendData));
+        System.out.println("TO CLIENT: " + sendData.length + " bytes");
         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, sourceIP, sourcePort);
         server.send(sendPacket);
     }

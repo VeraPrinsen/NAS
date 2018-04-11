@@ -1,5 +1,7 @@
 package client;
 
+import filewriter.FileWriterClass;
+
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -49,18 +51,32 @@ class UDPClient {
             }
         }
 
-        byte[] receiveData = new byte[1024 * 63];
-
         if (sendData.length <= (1024*63)) {
+            // send data
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);
+
+            // receive data
+            byte[] receiveData = new byte[1024 * 63];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             clientSocket.receive(receivePacket);
-            byte[] receivedDataByteArray = receivePacket.getData();
-            String modifiedSentence = new String(receivedDataByteArray);
-            System.out.println("FROM SERVER:" + modifiedSentence.length() + " bytes: " + modifiedSentence);
+
+            // Show on console information about the packet
+            int k = receivePacket.getLength();
+            byte[] messageBytes = receivePacket.getData();
+            String message = new String(messageBytes);
+
+            // Convert DatagramPacket into a byte array of the right length
+            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
+            byte[] receivedData = new byte[k];
+
+            for (int i = 0; i < k; i++) {
+                receivedData[i] = dataInputStream.readByte();
+            }
+
+            System.out.println("FROM SERVER:" + k + " bytes: " + new String(receivedData));
             clientSocket.close();
         } else {
             System.out.println("Data is too large");
@@ -82,19 +98,34 @@ class UDPClient {
             }
         }
 
-        byte[] receiveData = new byte[1024 * 63];
-
         if (sendData.length <= (1024*63)) {
+            // send data
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);
+
+            // receive data
+            byte[] receiveData = new byte[1024 * 63];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             clientSocket.receive(receivePacket);
-            byte[] receivedDataByteArray = receivePacket.getData();
-            String modifiedSentence = new String(receivedDataByteArray);
-            System.out.println("FROM SERVER:" + modifiedSentence.length() + " bytes: " + modifiedSentence);
 
+            // Show on console information about the packet
+            int k = receivePacket.getLength();
+            byte[] messageBytes = receivePacket.getData();
+            String message = new String(messageBytes);
+
+            // Convert DatagramPacket into a byte array of the right length
+            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
+            byte[] receivedData = new byte[k];
+
+            for (int i = 0; i < k; i++) {
+                receivedData[i] = dataInputStream.readByte();
+            }
+
+            FileWriterClass.byteArrayToFile(receivedData, outputFilename);
+
+            System.out.println("FROM SERVER: " + k + " bytes: " + new String(receivedData));
             clientSocket.close();
         } else {
             System.out.println("Data is too large");
