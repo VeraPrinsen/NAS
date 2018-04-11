@@ -8,9 +8,9 @@ public class ClientHandler implements Runnable {
     private byte[] message;
     private InetAddress sourceIP;
     private int sourcePort;
-    private UDPServer server;
+    private Server server;
 
-    public ClientHandler(byte[] message, InetAddress sourceIP, int sourcePort, UDPServer server) {
+    public ClientHandler(byte[] message, InetAddress sourceIP, int sourcePort, Server server) {
         this.message = message;
         this.sourceIP = sourceIP;
         this.sourcePort = sourcePort;

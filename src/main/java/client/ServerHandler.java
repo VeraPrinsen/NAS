@@ -2,8 +2,6 @@ package client;
 
 import filereader.FileReaderClass;
 
-import java.io.File;
-
 public class ServerHandler implements Runnable {
 
     private String message;
@@ -16,7 +14,7 @@ public class ServerHandler implements Runnable {
         switch (message) {
             case "Send1":
                 try {
-                    UDPClient.sendFixedBytes();
+                    Client.sendFixedBytes();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -24,19 +22,18 @@ public class ServerHandler implements Runnable {
 
             case "UPLOAD":
                 String pathname = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/";
-                //String filename = "testfile.txt";
-                //String outputFilename = "testfileReturn.txt";
+                String filename = "testfile.txt";
+                String outputFilename = "testfileReturn.txt";
                 //String filename = "testfile.docx";
                 //String outputFilename = "testfileReturn.docx";
                 //String filename = "rdtcInput5.png";
                 //String outputFilename = "rdtcInput5Return.png";
-                String filename = "mariokart.jpg";
-                String outputFilename = "mariokartReturn.jpg";
+                //String filename = "mariokart.jpg";
+                //String outputFilename = "mariokartReturn.jpg";
 
-                File file = new File(pathname + filename);
-                byte[] array = FileReaderClass.fileToByteArray(file);
+                byte[] array = FileReaderClass.fileToByteArray(pathname + filename);
                 try {
-                    UDPClient.sendBytes(array, pathname + outputFilename);
+                    Client.sendBytes(array, pathname + outputFilename);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

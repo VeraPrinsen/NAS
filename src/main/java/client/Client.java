@@ -1,26 +1,27 @@
 package client;
 
 import filewriter.FileWriterClass;
-
+import general.HeaderInfo;
+import general.Host;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-class UDPClient {
+class Client extends Host {
 
     private ClientTUI clientTUI;
     private Thread clientTUIThread;
 
-    public UDPClient() {
+    public Client() {
         this.clientTUI = new ClientTUI();
         this.clientTUIThread = new Thread(clientTUI);
         clientTUIThread.start();
     }
 
     public static void main(String[] args) {
-        new UDPClient();
+        new Client();
     }
 
     public static void sendFixedBytes() throws Exception {
@@ -53,7 +54,7 @@ class UDPClient {
 
         if (sendData.length <= (1024*63)) {
             // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, HeaderInfo.DEFAULT_PORT);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);
@@ -100,7 +101,7 @@ class UDPClient {
 
         if (sendData.length <= (1024*63)) {
             // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, HeaderInfo.DEFAULT_PORT);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);

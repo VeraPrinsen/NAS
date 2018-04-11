@@ -14,7 +14,7 @@ public class Main {
         System.out.println("Hello, Nedap University!");
 
         try {
-            new UDPServer().start();
+            new Server().start();
         } catch (Exception e) {
             e.printStackTrace();
         }

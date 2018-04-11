@@ -6,9 +6,9 @@ import java.nio.file.Files;
 
 public class FileReaderClass {
 
-
-    public static byte[] fileToByteArray(File file) {
+    public static byte[] fileToByteArray(String filename) {
         byte[] array = new byte[0];
+        File file = new File(filename);
         try {
             array = Files.readAllBytes(file.toPath());
         } catch (IOException e) {

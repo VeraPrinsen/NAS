@@ -8,28 +8,28 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.io.ByteArrayInputStream;
 
+import general.HeaderInfo;
+import general.Host;
+import packagecontrol.SendPacket;
+
 // Server doesn't connect with a specific client, it just listens to incoming packets
 // and reacts on them. In this class the listening socket is made and incoming messages
 // are further processed.
-class UDPServer {
+class Server extends Host {
 
     private DatagramSocket serverSocket;
 
-    public UDPServer() {
-        try {
-            this.serverSocket = new DatagramSocket(9876);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
+    public Server() {
+        createSocket(HeaderInfo.DEFAULT_PORT);
     }
 
     public void start() throws Exception
     {
         while(true) {
             // Receive a packet
-            byte[] receiveData = new byte[1024 * 63];
+            byte[] receiveData = new byte[HeaderInfo.maxDataSize];
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            serverSocket.receive(receivePacket);
+            getHostSocket().receive(receivePacket);
 
             // Show on console information about the packet
             int k = receivePacket.getLength();
@@ -50,15 +50,10 @@ class UDPServer {
             // Send back to the client
             InetAddress IPAddress = receivePacket.getAddress();
             int port = receivePacket.getPort();
-            new Thread(new ClientHandler(sendData, IPAddress, port, this)).start();
-        }
-    }
 
-    public void send(DatagramPacket datagramPacket) {
-        try {
-            serverSocket.send(datagramPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
+            new Thread(new SendPacket(this, IPAddress, port, HeaderInfo.SENDDATA, 0, 0, sendData)).start();
+
+            // new Thread(new ClientHandler(sendData, IPAddress, port, this)).start();
         }
     }
 }
