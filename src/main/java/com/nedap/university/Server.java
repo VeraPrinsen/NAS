@@ -5,12 +5,11 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.io.ByteArrayInputStream;
 
 import general.HeaderInfo;
 import general.Host;
-import packagecontrol.SendPacket;
+import packagecontrol.ByteMessage;
 
 // Server doesn't connect with a specific client, it just listens to incoming packets
 // and reacts on them. In this class the listening socket is made and incoming messages
@@ -23,37 +22,44 @@ class Server extends Host {
         createSocket(HeaderInfo.DEFAULT_PORT);
     }
 
-    public void start() throws Exception
-    {
-        while(true) {
+    // Keeps listening on the port for requests from clients.
+    public void start() {
+
+        while(true) {               // maybe make an option to stop the program?
             // Receive a packet
-            byte[] receiveData = new byte[HeaderInfo.maxDataSize];
+            byte[] receiveData = new byte[HeaderInfo.maxDataSize]; // empty buffer
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            getHostSocket().receive(receivePacket);
-
-            // Show on console information about the packet
-            int k = receivePacket.getLength();
-            byte[] messageBytes = receivePacket.getData();
-            String message = new String(messageBytes);
-
-            // Convert DatagramPacket into a byte array of the right length
-            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
-            byte[] sendData = new byte[k];
-
-            for (int i = 0; i < k; i++) {
-                sendData[i] = dataInputStream.readByte();
+            try {
+                getHostSocket().receive(receivePacket);
+            } catch (IOException e) {
+                // when connection is closed?
+                e.printStackTrace();
             }
 
-            //System.out.println("FROM CLIENT: " + k + " bytes: " + new String(sendData));
-            System.out.println("FROM CLIENT: " + k + " bytes");
+            // Convert DatagramPacket into a byte array of the right length
+            int k = receivePacket.getLength();
+            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(receivePacket.getData()));
+            byte[] byteMessage = new byte[k];
 
-            // Send back to the client
+            for (int i = 0; i < k; i++) {
+                try {
+                    byteMessage[i] = dataInputStream.readByte();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            showInfo(byteMessage);
+
+            // Give to MessageHandler for further processing
             InetAddress IPAddress = receivePacket.getAddress();
             int port = receivePacket.getPort();
-
-            new Thread(new SendPacket(this, IPAddress, port, HeaderInfo.SENDDATA, 0, 0, sendData)).start();
-
-            // new Thread(new ClientHandler(sendData, IPAddress, port, this)).start();
+            new Thread(new MessageHandler(new ByteMessage(byteMessage, IPAddress, port), this)).start();
         }
+    }
+
+    private void showInfo(byte[] message) {
+        System.out.println("FROM CLIENT: " + message.length + " bytes");
+        System.out.println("MESSAGE TO STRING: " + new String(message));
     }
 }
