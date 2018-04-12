@@ -4,12 +4,10 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.io.ByteArrayInputStream;
 
 import general.Info;
 import general.Host;
-import packagecontrol.ByteMessage;
 
 // Server doesn't connect with a specific client, it just listens to incoming packets
 // and reacts on them. In this class the listening socket is made and incoming messages
@@ -19,7 +17,7 @@ class Server extends Host {
     private DatagramSocket serverSocket;
 
     public Server() {
-        createSocket(Info.DEFAULT_PORT);
+        createSocket(Info.DEFAULT_SERVER_PORT);
     }
 
     // Keeps listening on the port for messages from clients.
@@ -27,7 +25,7 @@ class Server extends Host {
 
         while(true) {               // maybe make an option to stop the program?
             // Receive a packet
-            byte[] receiveData = new byte[Info.maxDataSize]; // empty buffer
+            byte[] receiveData = new byte[Info.maxPacketSize]; // empty buffer
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
                 getHostSocket().receive(receivePacket);
@@ -40,7 +38,7 @@ class Server extends Host {
             showInfo(byteMessage);
 
             // Give to MessageHandler for further processing
-            new Thread(new MessageHandler(new ByteMessage(byteMessage, receivePacket.getAddress(), receivePacket.getPort()), this)).start();
+            // new Thread(new MessageHandler(new ByteMessage(byteMessage, receivePacket.getAddress(), receivePacket.getPort()), this)).start();
         }
     }
 

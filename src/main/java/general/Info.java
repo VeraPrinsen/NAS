@@ -18,37 +18,53 @@ public class Info {
     public static final int LASTINDEX_SEQUENCE = 3;
     public static final int SEQUENCESIZE = LASTINDEX_SEQUENCE - FIRSTINDEX_SEQUENCE + 1;
 
-    public static final int FIRSTINDEX_DATA = 4;
-    public static final int HEADERSIZE = COMMANDSIZE + TASKSIZE + SEQUENCESIZE;
+    public static final int FIRSTINDEX_PACKETSIZE = 4;
+    public static final int LASTINDEX_PACKETSIZE = 5;
+    public static final int PACKETSIZESIZE = LASTINDEX_PACKETSIZE - FIRSTINDEX_PACKETSIZE + 1;
+
+    public static final int FIRSTINDEX_CHECKSUM = 6;
+    public static final int LASTINDEX_CHECKSUM = 6;
+    public static final int CHECKSUMSIZE = LASTINDEX_CHECKSUM - FIRSTINDEX_CHECKSUM + 1;
+
+    public static final int FIRSTINDEX_DATA = 7;
+    public static final int HEADERSIZE = COMMANDSIZE + TASKSIZE + SEQUENCESIZE + PACKETSIZESIZE + CHECKSUMSIZE;
 
     // COMMANDS (2 bytes)
     public static final String DOWNLOAD = "DL";
     public static final String UPLOAD = "UL";
     public static final String PAUSE = "PS";
     public static final String RESUME = "RS";
+
     public static final String ACK_OK = "AO";
     public static final String ACK_DENIED = "AD";
+
+    public static final String FIRST = "FS";
+    public static final String LAST = "LS";
     public static final String SENDDATA = "SD";
-    public static final String FINAL = "FN";
+    public static final String SINGLE = "SN";
 
 
     // Other info
-    public static final int maxDataSize = 1024 * 63;  // maximum size of packet in bytes (without header)
-    public static final int maxTaskNo = 256;                // maximum task number (1 byte)
-    public static final int maxSequenceNo = 256;            // maximum sequence number (1 byte)
+    public static final int maxPacketSize = 50;
+    public static final int maxDataSize = maxPacketSize - HEADERSIZE;  // maximum size of packet in bytes (without header)
+    public static final int maxTaskNo = 2^(TASKSIZE * 8);            // maximum task number (1 byte)
+    public static final int maxSequenceNo = 2^(SEQUENCESIZE * 8);   // maximum sequence number (1 byte)
     public static final int TIMEOUT = 3000;                 // Timeout for Acknowledgement (in ms)
     public static final int SWS = 100;                      // Send Window Size (# packets)
     public static final int RWS = 50;                       // Receive Window Size (# packets)
 
 
     public static final String DELIMITER = "_";
-    public static final int DEFAULT_PORT = 9876;
-    public static InetAddress DEFAULT_IP = null;
-    static {
+    public static final int DEFAULT_SERVER_PORT = 9876;
+    public static final int DEFAULT_CLIENT_PORT = 4567;
+    public static InetAddress getDefaultIp() {
         try {
-            DEFAULT_IP = InetAddress.getByName("192.168.1.1");
+            //return InetAddress.getByName("192.168.1.1");
+            return InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            return null;
         }
     }
+
 }

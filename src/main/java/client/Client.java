@@ -3,6 +3,8 @@ package client;
 import fileoperators.FileWriterClass;
 import general.Info;
 import general.Host;
+
+import javax.xml.soap.Text;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,122 +15,53 @@ import java.net.UnknownHostException;
 class Client extends Host {
 
     private ClientTUI clientTUI;
+    boolean keepGoing = true;
 
     public Client() {
         this.clientTUI = new ClientTUI();
-        clientTUI.run();
+        createSocket(Info.DEFAULT_CLIENT_PORT);
+        new Thread(new SocketListener(this)).start();
+        start();
+    }
+
+    /**
+     * Starts the client
+     *      Show options
+     */
+    private void start() {
+        TextResources.General.welcomeMessage();
+
+        while (keepGoing) {
+            TextResources.General.mainMenu();
+            int response = readInt("Enter your choice");
+            while (response < 0 || response > 5) {
+                response = readInt("Invalid option, choose again");
+            }
+            new ClientInputHandler(this, response);
+        }
+
+    }
+
+    // Input & Output ======================================================
+    public void print(String msg) {
+        clientTUI.print(msg);
+    }
+
+    public String readString(String prompt) {
+        return clientTUI.readString(prompt);
+    }
+
+    public int readInt(String prompt) {
+        return clientTUI.readInt(prompt);
+    }
+
+    // Exit ================================================================
+    public void exit() {
+        TextResources.General.exit();
+        keepGoing = false;
     }
 
     public static void main(String[] args) {
         new Client();
-    }
-
-    public static void sendFixedBytes() throws Exception {
-        // byte[] sendData;
-        byte[] sendData = new byte[1024 * 63];
-
-        // String sentence = inFromUser.readLine();
-        String sentence = "";
-        for (int i = 0; i < sendData.length; i++) {
-            sentence = sentence + "A";
-        }
-
-        sendBytes(sentence.getBytes());
-    }
-
-    public static void sendBytes(byte[] sendData) throws Exception {
-        DatagramSocket clientSocket = new DatagramSocket();
-        InetAddress IPAddress = null;
-        while (IPAddress == null) {
-            try {
-                // IPAddress = InetAddress.getByName("applepi");
-                // IPAddress = InetAddress.getByName("192.168.1.1");
-
-                IPAddress = InetAddress.getByName("localhost");
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-                break;
-            }
-        }
-
-        if (sendData.length <= (1024*63)) {
-            // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Info.DEFAULT_PORT);
-            String sendDataString = new String(sendPacket.getData());
-            System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
-            clientSocket.send(sendPacket);
-
-            // receive data
-            byte[] receiveData = new byte[1024 * 63];
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-
-            // Show on console information about the packet
-            int k = receivePacket.getLength();
-            byte[] messageBytes = receivePacket.getData();
-            String message = new String(messageBytes);
-
-            // Convert DatagramPacket into a byte array of the right length
-            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
-            byte[] receivedData = new byte[k];
-
-            for (int i = 0; i < k; i++) {
-                receivedData[i] = dataInputStream.readByte();
-            }
-
-            System.out.println("FROM SERVER:" + k + " bytes: " + new String(receivedData));
-            clientSocket.close();
-        } else {
-            System.out.println("Data is too large");
-        }
-    }
-
-    public static void sendBytes(byte[] sendData, String outputFilename) throws Exception {
-        DatagramSocket clientSocket = new DatagramSocket();
-        InetAddress IPAddress = null;
-        while (IPAddress == null) {
-            try {
-                // IPAddress = InetAddress.getByName("applepi");
-                // IPAddress = InetAddress.getByName("192.168.1.1");
-
-                IPAddress = InetAddress.getByName("localhost");
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-                break;
-            }
-        }
-
-        if (sendData.length <= (1024*63)) {
-            // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Info.DEFAULT_PORT);
-            String sendDataString = new String(sendPacket.getData());
-            System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
-            clientSocket.send(sendPacket);
-
-            // receive data
-            byte[] receiveData = new byte[1024 * 63];
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);
-
-            // Show on console information about the packet
-            int k = receivePacket.getLength();
-            byte[] messageBytes = receivePacket.getData();
-            String message = new String(messageBytes);
-
-            // Convert DatagramPacket into a byte array of the right length
-            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
-            byte[] receivedData = new byte[k];
-
-            for (int i = 0; i < k; i++) {
-                receivedData[i] = dataInputStream.readByte();
-            }
-
-            FileWriterClass.byteArrayToFile(receivedData, outputFilename);
-
-            System.out.println("FROM SERVER: " + k + " bytes: " + new String(receivedData));
-            clientSocket.close();
-        } else {
-            System.out.println("Data is too large");
-        }
     }
 }

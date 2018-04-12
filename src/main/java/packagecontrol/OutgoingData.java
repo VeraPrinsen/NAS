@@ -1,42 +1,33 @@
 package packagecontrol;
 
 import general.Info;
+import general.Methods;
 
 import java.net.InetAddress;
 import java.util.Arrays;
 
-public class BytePacket {
+public class OutgoingData {
 
     private String command;
     private int taskNo;
-    private int sequenceNo;
-    private byte[] data;
     private InetAddress destinationIP;
     private int destinationPort;
+    private byte[] data;
 
-    public BytePacket(byte[] data, String command, int taskNo, int sequenceNo, InetAddress destinationIP, int destinationPort) {
+    public OutgoingData(String command, int taskNo, InetAddress destinationIP, int destinationPort, byte[] data) {
         this.command = command;
         this.taskNo = taskNo;
-        this.sequenceNo = sequenceNo;
-        this.data = data;
         this.destinationIP = destinationIP;
         this.destinationPort = destinationPort;
+        this.data = data;
     }
 
     public String getCommand() {
-        return this.command;
+        return command;
     }
 
     public int getTaskNo() {
         return taskNo;
-    }
-
-    public int getSequenceNo() {
-        return sequenceNo;
-    }
-
-    public byte[] getData() {
-        return data;
     }
 
     public InetAddress getDestinationIP() {
@@ -45,5 +36,9 @@ public class BytePacket {
 
     public int getDestinationPort() {
         return destinationPort;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 }

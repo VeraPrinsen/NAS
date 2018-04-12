@@ -1,14 +1,14 @@
 package com.nedap.university;
 
 import general.Info;
-import packagecontrol.ByteMessage;
+import packagecontrol.IncomingPacket;
 
 public class MessageHandler implements Runnable {
 
-    private ByteMessage message;
+    private IncomingPacket message;
     private Server server;
 
-    public MessageHandler(ByteMessage message, Server server) {
+    public MessageHandler(IncomingPacket message, Server server) {
         this.message = message;
         this.server = server;
     }
@@ -16,7 +16,7 @@ public class MessageHandler implements Runnable {
     public void run() {
         if (!(message.getCommand().equals(Info.ACK_OK) || message.getCommand().equals(Info.ACK_DENIED))) {
             // If the command was not an ACK_OK or ACK_DENIED, send Ack
-            CommandHandler.sendAck(message, server);
+            //CommandHandler.sendAck(message, server);
         }
 
         // DO SOMETHING
@@ -37,16 +37,23 @@ public class MessageHandler implements Runnable {
                 CommandHandler.resume();
                 break;
 
-            case Info.SENDDATA:
-                CommandHandler.senddata();
+            case Info.FIRST:
+                CommandHandler.firstData();
                 break;
 
-            case Info.FINAL:
-                CommandHandler.finaldata();
+            case Info.LAST:
+                CommandHandler.lastData();
+                break;
+
+            case Info.SINGLE:
+                CommandHandler.singleData();
+
+            case Info.SENDDATA:
+                CommandHandler.sendData();
                 break;
 
             default:
-                CommandHandler.defaultSend(message, server);
+                //CommandHandler.defaultSend(message, server);
                 break;
         }
     }

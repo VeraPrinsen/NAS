@@ -2,51 +2,45 @@ package client;
 
 import fileoperators.FileReaderClass;
 
-public class ClientInputHandler implements Runnable {
+public class ClientInputHandler {
 
-    private String message;
+    private Client client;
+    private int choice;
 
-    public ClientInputHandler(String message) {
-        this.message = message;
+    public ClientInputHandler(Client client, int choice) {
+        this.client = client;
+        this.choice = choice;
+        start();
     }
 
-    public void run() {
-        switch (message) {
-            case "HELP":
-                CommandHandler.help();
+    private void start() {
+        switch (choice) {
+            case 0:
+                client.exit();
                 break;
 
-            case "Send1":
-                try {
-                    Client.sendFixedBytes();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            case 1:
+                CommandHandler.download();
                 break;
 
-            case "UPLOAD":
-                String pathname = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/";
-                String filename = "testfile.txt";
-                String outputFilename = "testfileReturn.txt";
-                //String filename = "testfile.docx";
-                //String outputFilename = "testfileReturn.docx";
-                //String filename = "rdtcInput5.png";
-                //String outputFilename = "rdtcInput5Return.png";
-                //String filename = "mariokart.jpg";
-                //String outputFilename = "mariokartReturn.jpg";
+            case 2:
+                CommandHandler.upload();
+                break;
 
-                byte[] array = FileReaderClass.fileToByteArray(pathname + filename);
-                try {
-                    Client.sendBytes(array, pathname + outputFilename);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            case 3:
+                CommandHandler.fileList();
+                break;
 
+            case 4:
+                CommandHandler.testSmallPacket(client);
+                break;
+
+            case 5:
+                CommandHandler.testLargePacket(client);
                 break;
 
             default:
-                //CommandHandler.defaultsend(client);
-
+                // Unknown command
         }
     }
 }
