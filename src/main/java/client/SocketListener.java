@@ -1,6 +1,6 @@
 package client;
 
-import general.Info;
+import general.Protocol;
 import packagecontrol.ReceivePacket;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class SocketListener implements Runnable {
     }
 
     public void run() {
-        byte[] buffer = new byte[Info.maxPacketSize]; // empty buffer
+        byte[] buffer = new byte[Protocol.maxPacketSize]; // empty buffer
         DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
         try {
             hostSocket.receive(receivePacket);

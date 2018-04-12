@@ -1,7 +1,7 @@
 package packagecontrol;
 
-import general.Info;
-import general.Methods;
+import general.Protocol;
+import general.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -16,6 +16,7 @@ public class IncomingPacket {
     private int sourcePort;
 
     private String command;
+    private String sequenceCmd;
     private int taskNo;
     private int sequenceNo;
     private byte[] packetSize;
@@ -32,12 +33,13 @@ public class IncomingPacket {
 
         byte[] byteMessage = getMessage(receivedPacket);
 
-        this.command = new String(Arrays.copyOfRange(byteMessage, Info.FIRSTINDEX_COMMAND, Info.LASTINDEX_COMMAND));
-        this.taskNo = Methods.byteArrayToInt(Arrays.copyOfRange(byteMessage, Info.FIRSTINDEX_TASK, Info.LASTINDEX_TASK));
-        this.sequenceNo = Methods.byteArrayToInt(Arrays.copyOfRange(byteMessage, Info.FIRSTINDEX_SEQUENCE, Info.LASTINDEX_SEQUENCE));
-        this.packetSize = Arrays.copyOfRange(byteMessage, Info.FIRSTINDEX_PACKETSIZE, Info.LASTINDEX_PACKETSIZE);
-        this.checkSum = Arrays.copyOfRange(byteMessage, Info.FIRSTINDEX_CHECKSUM, Info.LASTINDEX_CHECKSUM);
-        this.data = Arrays.copyOfRange(byteMessage,Info.FIRSTINDEX_DATA, byteMessage.length-1);
+        this.command = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_COMMAND, Protocol.LASTINDEX_COMMAND));
+        this.sequenceCmd = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCECMD, Protocol.LASTINDEX_SEQUENCECMD));
+        this.taskNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_TASK, Protocol.LASTINDEX_TASK));
+        this.sequenceNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCE, Protocol.LASTINDEX_SEQUENCE));
+        this.packetSize = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_PACKETSIZE, Protocol.LASTINDEX_PACKETSIZE);
+        this.checkSum = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM);
+        this.data = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATA, byteMessage.length-1);
     }
 
     private byte[] getMessage(DatagramPacket datagramPacket) {
@@ -67,6 +69,10 @@ public class IncomingPacket {
 
     public String getCommand() {
         return this.command;
+    }
+
+    public String getSequenceCmd() {
+        return this.sequenceCmd;
     }
 
     public int getTaskNo() {

@@ -15,7 +15,9 @@ public class ReceivePacket implements Runnable {
 
         // check packetSize && checkSum
 
-
+        // react on package
+        // ack
+        // further actions
     }
 
 

@@ -1,15 +1,7 @@
 package client;
 
-import fileoperators.FileWriterClass;
-import general.Info;
+import general.Protocol;
 import general.Host;
-
-import javax.xml.soap.Text;
-import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 // Client doesn't listen to the Server, only gets expected responses?
 class Client extends Host {
@@ -19,7 +11,7 @@ class Client extends Host {
 
     public Client() {
         this.clientTUI = new ClientTUI();
-        createSocket(Info.DEFAULT_CLIENT_PORT);
+        createSocket(Protocol.DEFAULT_CLIENT_PORT);
         new Thread(new SocketListener(this)).start();
         start();
     }

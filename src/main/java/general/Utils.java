@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
-public class Methods {
+public class Utils {
 
     public static byte[] byteConcat(byte[]... args) {
         byte[] arrayA = args[0];

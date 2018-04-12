@@ -1,4 +1,4 @@
-package com.nedap.university;
+package server;
 
 public class Main {
 

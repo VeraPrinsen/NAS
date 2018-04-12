@@ -1,6 +1,6 @@
 package packagecontrol;
 
-import general.Info;
+import general.Protocol;
 import general.Host;
 
 import java.util.Arrays;
@@ -22,7 +22,7 @@ public class Task implements Runnable {
     // TO DO: Hier moet nog wel gecheckt worden of een packet gestuurd mag worden volgens de Sliding Window
     // TO DO: Sequence number moet na 255 terug naar 0 gaan
     private void sendPackets() {
-        int nPackets = (int) Math.ceil((double) data.getData().length / Info.maxDataSize);
+        int nPackets = (int) Math.ceil((double) data.getData().length / Protocol.maxDataSize);
         int sequenceNo = 0;
 
         for (int i = 0; i < nPackets; i++) {
@@ -30,29 +30,25 @@ public class Task implements Runnable {
             if (i == nPackets - 1) {
                 endIndex = data.getData().length;
             } else {
-                endIndex = ((i+1)* Info.maxDataSize) + 1;
+                endIndex = ((i+1)* Protocol.maxDataSize) + 1;
             }
 
-            byte[] packet = Arrays.copyOfRange(data.getData(), i* Info.maxDataSize, endIndex);
+            byte[] packet = Arrays.copyOfRange(data.getData(), i* Protocol.maxDataSize, endIndex);
 
-            String tempCommand;
-            if (data.getCommand().equals(Info.SENDDATA)) {
-                if (nPackets == 1) {
-                    tempCommand = Info.SINGLE;
-                } else if (i == 0) {
-                    tempCommand = Info.FIRST;
-                } else if (i == nPackets - 1) {
-                    tempCommand = Info.LAST;
-                } else {
-                    tempCommand = Info.SENDDATA;
-                }
+            String sequenceCmd;
+            if (nPackets == 1) {
+                sequenceCmd = Protocol.SINGLE;
+            } else if (i == 0) {
+                sequenceCmd = Protocol.FIRST;
+            } else if (i == nPackets - 1) {
+                sequenceCmd = Protocol.LAST;
             } else {
-                tempCommand = data.getCommand();
+                sequenceCmd = Protocol.CONTINUE;
             }
 
-            OutgoingPacket outgoingPacket = new OutgoingPacket(data, tempCommand, packet, sequenceNo);
+            OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, sequenceNo);
             new Thread(new SendPacket(host, outgoingPacket)).start();
-            sequenceNo = (sequenceNo + 1) % Info.maxDataSize;
+            sequenceNo = (sequenceNo + 1) % Protocol.maxSequenceNo;
         }
     }
 }

@@ -2,7 +2,7 @@ package client;
 
 import fileoperators.FileReaderClass;
 import fileoperators.FileWriterClass;
-import general.Info;
+import general.Protocol;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -50,7 +50,7 @@ public class OldMethods {
 
         if (sendData.length <= (1024*63)) {
             // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Info.DEFAULT_SERVER_PORT);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Protocol.DEFAULT_SERVER_PORT);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);
@@ -97,7 +97,7 @@ public class OldMethods {
 
         if (sendData.length <= (1024*63)) {
             // send data
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Info.DEFAULT_SERVER_PORT);
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, Protocol.DEFAULT_SERVER_PORT);
             String sendDataString = new String(sendPacket.getData());
             System.out.println("TO SERVER: " + sendDataString.length() + " bytes: " + sendDataString);
             clientSocket.send(sendPacket);

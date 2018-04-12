@@ -1,6 +1,6 @@
-package com.nedap.university;
+package server;
 
-import general.Info;
+import general.Protocol;
 import packagecontrol.IncomingPacket;
 
 public class MessageHandler implements Runnable {
@@ -14,41 +14,41 @@ public class MessageHandler implements Runnable {
     }
 
     public void run() {
-        if (!(message.getCommand().equals(Info.ACK_OK) || message.getCommand().equals(Info.ACK_DENIED))) {
+        if (!(message.getCommand().equals(Protocol.ACK_OK) || message.getCommand().equals(Protocol.ACK_DENIED))) {
             // If the command was not an ACK_OK or ACK_DENIED, send Ack
             //CommandHandler.sendAck(message, server);
         }
 
         // DO SOMETHING
         switch (message.getCommand()) {
-            case Info.DOWNLOAD:
+            case Protocol.DOWNLOAD:
                 CommandHandler.download();
                 break;
 
-            case Info.UPLOAD:
+            case Protocol.UPLOAD:
                 CommandHandler.upload();
                 break;
 
-            case Info.PAUSE:
+            case Protocol.PAUSE:
                 CommandHandler.pause();
                 break;
 
-            case Info.RESUME:
+            case Protocol.RESUME:
                 CommandHandler.resume();
                 break;
 
-            case Info.FIRST:
+            case Protocol.FIRST:
                 CommandHandler.firstData();
                 break;
 
-            case Info.LAST:
+            case Protocol.LAST:
                 CommandHandler.lastData();
                 break;
 
-            case Info.SINGLE:
+            case Protocol.SINGLE:
                 CommandHandler.singleData();
 
-            case Info.SENDDATA:
+            case Protocol.SENDDATA:
                 CommandHandler.sendData();
                 break;
 

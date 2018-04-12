@@ -1,10 +1,6 @@
 package packagecontrol;
 
-import general.Info;
-import general.Methods;
-
 import java.net.InetAddress;
-import java.util.Arrays;
 
 public class OutgoingData {
 

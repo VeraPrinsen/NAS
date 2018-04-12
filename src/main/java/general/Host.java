@@ -37,7 +37,7 @@ public class Host {
     }
 
     private String getAckString(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
-        return sourceIP.toString() + Info.DELIMITER + sourcePort + Info.DELIMITER + taskNo + Info.DELIMITER + sequenceNo;
+        return sourceIP.toString() + Protocol.DELIMITER + sourcePort + Protocol.DELIMITER + taskNo + Protocol.DELIMITER + sequenceNo;
     }
 
     public void send(DatagramPacket datagramPacket) {

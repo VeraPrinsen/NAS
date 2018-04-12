@@ -1,9 +1,8 @@
 package packagecontrol;
 
-import client.SocketListener;
 import general.Host;
-import general.Info;
-import general.Methods;
+import general.Protocol;
+import general.Utils;
 
 import java.net.DatagramPacket;
 
@@ -27,15 +26,16 @@ public class SendPacket implements Runnable {
     }
 
     private DatagramPacket createPacket() {
-        int nBytes = Info.HEADERSIZE + packet.getData().length;
+        int nBytes = Protocol.HEADERSIZE + packet.getData().length;
 
         byte[] bCommand = packet.getCommand().getBytes();
-        byte[] bTask = Methods.intToByteArray(packet.getTaskNo(), Info.TASKSIZE);
-        byte[] bSequence = Methods.intToByteArray(packet.getSequenceNo(), Info.SEQUENCESIZE);
-        byte[] bTotalBytes = new byte[Info.PACKETSIZESIZE];
-        byte[] bChecksum = new byte[Info.CHECKSUMSIZE];
+        byte[] bSequenceCmd = packet.getSequenceCmd().getBytes();
+        byte[] bTask = Utils.intToByteArray(packet.getTaskNo(), Protocol.TASKSIZE);
+        byte[] bSequence = Utils.intToByteArray(packet.getSequenceNo(), Protocol.SEQUENCESIZE);
+        byte[] bTotalBytes = new byte[Protocol.PACKETSIZESIZE];
+        byte[] bChecksum = new byte[Protocol.CHECKSUMSIZE];
 
-        byte[] sendData = Methods.byteConcat(bCommand, bTask ,bSequence, bTotalBytes, bChecksum, packet.getData());
+        byte[] sendData = Utils.byteConcat(bCommand, bSequenceCmd, bTask ,bSequence, bTotalBytes, bChecksum, packet.getData());
         if (nBytes == sendData.length) {
             return new DatagramPacket(sendData, sendData.length, packet.getDestinationIP(), packet.getDestinationPort());
         } else {
@@ -53,7 +53,7 @@ public class SendPacket implements Runnable {
             System.out.println("Packet send");
             nTransmissions++;
             long startTime = System.currentTimeMillis();
-            long endTime = startTime + Info.TIMEOUT;
+            long endTime = startTime + Protocol.TIMEOUT;
 
             while (!ackReceived && System.currentTimeMillis() < endTime) {
                 if (host.hasAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo())) {

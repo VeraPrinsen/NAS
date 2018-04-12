@@ -1,4 +1,4 @@
-package com.nedap.university;
+package server;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -6,8 +6,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.io.ByteArrayInputStream;
 
-import general.Info;
+import general.Protocol;
 import general.Host;
+import packagecontrol.ReceivePacket;
 
 // Server doesn't connect with a specific client, it just listens to incoming packets
 // and reacts on them. In this class the listening socket is made and incoming messages
@@ -17,7 +18,8 @@ class Server extends Host {
     private DatagramSocket serverSocket;
 
     public Server() {
-        createSocket(Info.DEFAULT_SERVER_PORT);
+        createSocket(Protocol.DEFAULT_SERVER_PORT);
+        start();
     }
 
     // Keeps listening on the port for messages from clients.
@@ -25,7 +27,7 @@ class Server extends Host {
 
         while(true) {               // maybe make an option to stop the program?
             // Receive a packet
-            byte[] receiveData = new byte[Info.maxPacketSize]; // empty buffer
+            byte[] receiveData = new byte[Protocol.maxPacketSize]; // empty buffer
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             try {
                 getHostSocket().receive(receivePacket);
@@ -37,8 +39,7 @@ class Server extends Host {
             byte[] byteMessage = getMessage(receivePacket);
             showInfo(byteMessage);
 
-            // Give to MessageHandler for further processing
-            // new Thread(new MessageHandler(new ByteMessage(byteMessage, receivePacket.getAddress(), receivePacket.getPort()), this)).start();
+            new Thread(new ReceivePacket(receivePacket)).start();
         }
     }
 
@@ -62,5 +63,9 @@ class Server extends Host {
         }
 
         return byteMessage;
+    }
+
+    public static void main(String[] args) {
+        new Server();
     }
 }

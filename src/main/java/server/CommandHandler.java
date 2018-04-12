@@ -1,4 +1,4 @@
-package com.nedap.university;
+package server;
 
 import packagecontrol.OutgoingData;
 

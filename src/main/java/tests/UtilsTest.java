@@ -1,8 +1,9 @@
-package general;
+package tests;
 
+import general.Utils;
 import org.junit.*;
 
-public class MethodsTest {
+public class UtilsTest {
 
     @Before
     public void setUp() throws Exception {
@@ -17,7 +18,7 @@ public class MethodsTest {
         String sentenceD = "byte concat method.";
         String totalSentence = sentenceA + sentenceB + sentenceC + sentenceD;
 
-        byte[] result = Methods.byteConcat(sentenceA.getBytes(), sentenceB.getBytes(), sentenceC.getBytes(), sentenceD.getBytes());
+        byte[] result = Utils.byteConcat(sentenceA.getBytes(), sentenceB.getBytes(), sentenceC.getBytes(), sentenceD.getBytes());
 
         Assert.assertArrayEquals(totalSentence.getBytes(), result);
     }
@@ -28,7 +29,7 @@ public class MethodsTest {
         String sentenceB = "een test.";
         String totalSentence = sentenceA + sentenceB;
 
-        byte[] result = Methods.concat2byte(sentenceA.getBytes(), sentenceB.getBytes());
+        byte[] result = Utils.concat2byte(sentenceA.getBytes(), sentenceB.getBytes());
 
         Assert.assertArrayEquals(totalSentence.getBytes(), result);
     }
@@ -39,7 +40,7 @@ public class MethodsTest {
         byteArray[0] = 2;
         byteArray[1]= 2;
 
-        int result = Methods.byteArrayToInt(byteArray);
+        int result = Utils.byteArrayToInt(byteArray);
 
         Assert.assertEquals(514, result);
     }
@@ -47,7 +48,7 @@ public class MethodsTest {
     @Test
     public void intToByteArray() {
         int a = 10;
-        byte[] b = Methods.intToByteArray(a, 1);
+        byte[] b = Utils.intToByteArray(a, 1);
         byte[] aByte = new byte[1];
         aByte[0] = 0b0001010;
 
