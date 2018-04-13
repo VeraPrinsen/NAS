@@ -65,8 +65,8 @@ public class Protocol {
     public static final int DEFAULT_CLIENT_PORT = 4567;
     public static InetAddress getDefaultIp() {
         try {
-            return InetAddress.getByName("192.168.1.1");
-            // return InetAddress.getByName("localhost");
+            // return InetAddress.getByName("192.168.1.1");
+            return InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return null;

@@ -13,7 +13,7 @@ public class Main {
         running = true;
         System.out.println("Hello, Nedap University!");
 
-        new Server().start();
+        new Server();
 
         initShutdownHook();
 

@@ -20,7 +20,7 @@ public class SendPacket implements Runnable {
         DatagramPacket datagramPacket = createPacket();
         if (datagramPacket != null) {
             int transmission = sendPacket(datagramPacket);
-            System.out.println("Packet | " + host.getAckString(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo()) + " | send in " + transmission + " tries");
+            System.out.println("Packet | " + host.getAckController().ackString(this.packet.getTaskNo(), this.packet.getSequenceNo()) + " | send in " + transmission + " tries");
         } else {
 
         }
@@ -57,8 +57,7 @@ public class SendPacket implements Runnable {
             long endTime = startTime + Protocol.TIMEOUT;
 
             while (!ackReceived && System.currentTimeMillis() < endTime) {
-                if (host.hasAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo())) {
-                    host.receivedAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo());
+                if (host.getAckController().hasAck(this.packet.getTaskNo(), this.packet.getSequenceNo())) {
                     ackReceived = true;
                 }
                 try {

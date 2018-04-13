@@ -6,44 +6,34 @@ import general.Utils;
 
 import java.net.DatagramPacket;
 
-public class ReactOnMessage implements Runnable {
+public class TaskController {
 
     private Host host;
-    private IncomingPacket incomingPacket;
 
-    public ReactOnMessage(Host host, IncomingPacket incomingPacket) {
+    public TaskController(Host host) {
         this.host = host;
-        this.incomingPacket = incomingPacket;
     }
 
-    public void run() {
+    public void doSomething(IncomingPacket incomingPacket) {
         switch (incomingPacket.getCommand()) {
             case Protocol.DOWNLOAD:
-                sendAck();
+                sendAck(incomingPacket);
                 break;
 
             case Protocol.UPLOAD:
-                sendAck();
+                sendAck(incomingPacket);
                 break;
 
             case Protocol.PAUSE:
-                sendAck();
+                sendAck(incomingPacket);
                 break;
 
             case Protocol.RESUME:
-                sendAck();
+                sendAck(incomingPacket);
                 break;
 
             case Protocol.SENDDATA:
-                sendAck();
-                break;
-
-            case Protocol.ACK_OK:
-                saveAck();
-                break;
-
-            case Protocol.ACK_DENIED:
-                saveAck();
+                sendAck(incomingPacket);
                 break;
 
             default:
@@ -51,14 +41,13 @@ public class ReactOnMessage implements Runnable {
         }
     }
 
-    private void sendAck() {
-        System.out.println("Packet | " + incomingPacket.getTaskNo() + Protocol.DELIMITER + incomingPacket.getSequenceNo() + " | received");
-        DatagramPacket newAck = createPacket();
+    private void sendAck(IncomingPacket incomingPacket) {
+        DatagramPacket newAck = createPacket(incomingPacket);
         sendPacket(newAck);
-        System.out.println("Ack " + host.getAckString(host.getHostSocket().getInetAddress(), host.getHostSocket().getPort(), incomingPacket.getTaskNo(), incomingPacket.getSequenceNo()) + " send to " + incomingPacket.getSourceIP() + " " + incomingPacket.getSourcePort());
+        System.out.println("Ack | " + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + " | send to " + incomingPacket.getSourceIP() + " " + incomingPacket.getSourcePort());
     }
 
-    private DatagramPacket createPacket() {
+    private DatagramPacket createPacket(IncomingPacket incomingPacket) {
         int nBytes = Protocol.HEADERSIZE;
 
         byte[] bCommand = Protocol.ACK_OK.getBytes();
@@ -80,10 +69,4 @@ public class ReactOnMessage implements Runnable {
     private void sendPacket(DatagramPacket datagramPacket) {
         host.send(datagramPacket);
     }
-
-    private void saveAck() {
-        System.out.println("Ack | " + host.getAckString(this.incomingPacket.getSourceIP(), this.incomingPacket.getSourcePort(), this.incomingPacket.getTaskNo(), this.incomingPacket.getSequenceNo()) + " | received");
-        host.receivedAck(incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), incomingPacket.getTaskNo(), incomingPacket.getSequenceNo());
-    }
-
 }

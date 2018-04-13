@@ -3,17 +3,15 @@ package client;
 import general.Protocol;
 import general.Host;
 
-// Client doesn't listen to the Server, only gets expected responses?
 class Client extends Host {
 
     private ClientTUI clientTUI;
-    boolean keepGoing = true;
+    private boolean keepGoing = true;
 
     public Client() {
         this.clientTUI = new ClientTUI();
         createSocket(Protocol.DEFAULT_CLIENT_PORT);
         new Thread(new SocketListener(this)).start();
-        start();
     }
 
     /**
@@ -25,13 +23,13 @@ class Client extends Host {
 
         while (keepGoing) {
             TextResources.General.mainMenu();
+            // kan dit ook naar TextResources? Met de client in de input?
             int response = readInt("Enter your choice");
             while (response < 0 || response > 5) {
                 response = readInt("Invalid option, choose again");
             }
             new ClientInputHandler(this, response);
         }
-
     }
 
     // Input & Output ======================================================
@@ -54,6 +52,6 @@ class Client extends Host {
     }
 
     public static void main(String[] args) {
-        new Client();
+        new Client().start();
     }
 }

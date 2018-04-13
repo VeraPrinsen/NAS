@@ -2,18 +2,17 @@ package client;
 
 import general.Host;
 import general.Protocol;
-import packagecontrol.ReceivePacket;
+import packagecontrol.IncomingPacket;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 
 public class SocketListener implements Runnable {
 
-    private Client client;
+    private Host host;
 
-    public SocketListener(Client client) {
-        this.client = client;
+    public SocketListener(Host host) {
+        this.host = host;
     }
 
     public void run() {
@@ -21,13 +20,31 @@ public class SocketListener implements Runnable {
             byte[] buffer = new byte[Protocol.maxPacketSize]; // empty buffer
             DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
             try {
-                client.getHostSocket().receive(receivePacket);
+                host.getHostSocket().receive(receivePacket);
             } catch (IOException e) {
                 // when connection is closed?
                 e.printStackTrace();
             }
 
-            new Thread(new ReceivePacket(client, receivePacket)).start();
+            IncomingPacket incomingPacket = new IncomingPacket(receivePacket);
+            showInfo(incomingPacket);
+
+            switch (incomingPacket.getCommand()) {
+                case Protocol.ACK_OK:
+                case Protocol.ACK_DENIED:
+                    host.getAckController().receivedAck(incomingPacket.getTaskNo(), incomingPacket.getSequenceNo());
+                    break;
+
+                default:
+                    host.getTaskController().doSomething(incomingPacket);
+                    break;
+            }
+
+            //new Thread(new ReceivePacket(client, receivePacket)).start();
         }
+    }
+
+    private void showInfo(IncomingPacket packet) {
+        System.out.println(packet.getSourceIP() + "/" + packet.getSourcePort() + ": " + packet.getCommand() + "-" + packet.getSequenceCmd() + "-" + packet.getTaskNo() + "-" + packet.getSequenceNo() + " received");
     }
 }

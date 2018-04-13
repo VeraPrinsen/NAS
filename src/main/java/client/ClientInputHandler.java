@@ -1,7 +1,6 @@
 package client;
 
-import fileoperators.FileReaderClass;
-
+// Is not yet a new Thread, so no input can be given before this is resolved.
 public class ClientInputHandler {
 
     private Client client;
