@@ -33,13 +33,13 @@ public class IncomingPacket {
 
         byte[] byteMessage = getMessage(receivedPacket);
 
-        this.command = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_COMMAND, Protocol.LASTINDEX_COMMAND));
-        this.sequenceCmd = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCECMD, Protocol.LASTINDEX_SEQUENCECMD));
-        this.taskNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_TASK, Protocol.LASTINDEX_TASK));
-        this.sequenceNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCE, Protocol.LASTINDEX_SEQUENCE));
-        this.packetSize = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_PACKETSIZE, Protocol.LASTINDEX_PACKETSIZE);
-        this.checkSum = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM);
-        this.data = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATA, byteMessage.length-1);
+        this.command = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_COMMAND, Protocol.LASTINDEX_COMMAND+1));
+        this.sequenceCmd = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCECMD, Protocol.LASTINDEX_SEQUENCECMD+1));
+        this.taskNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_TASK, Protocol.LASTINDEX_TASK+1));
+        this.sequenceNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCE, Protocol.LASTINDEX_SEQUENCE+1));
+        this.packetSize = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_PACKETSIZE, Protocol.LASTINDEX_PACKETSIZE+1);
+        this.checkSum = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM+1);
+        this.data = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATA, byteMessage.length);
     }
 
     private byte[] getMessage(DatagramPacket datagramPacket) {

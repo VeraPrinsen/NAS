@@ -1,12 +1,16 @@
 package packagecontrol;
 
+import general.Host;
+
 import java.net.DatagramPacket;
 
 public class ReceivePacket implements Runnable {
 
+    private Host host;
     private DatagramPacket datagramPacket;
 
-    public ReceivePacket(DatagramPacket datagramPacket) {
+    public ReceivePacket(Host host, DatagramPacket datagramPacket) {
+        this.host = host;
         this.datagramPacket = datagramPacket;
     }
 
@@ -17,6 +21,8 @@ public class ReceivePacket implements Runnable {
 
         // react on package
         // ack
+        new Thread(new ReactOnMessage(host, incomingPacket)).start();
+
         // further actions
     }
 

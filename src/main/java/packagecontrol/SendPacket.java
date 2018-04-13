@@ -19,7 +19,8 @@ public class SendPacket implements Runnable {
     public void run() {
         DatagramPacket datagramPacket = createPacket();
         if (datagramPacket != null) {
-            sendPacket(datagramPacket);
+            int transmission = sendPacket(datagramPacket);
+            System.out.println("Packet | " + host.getAckString(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo()) + " | send in " + transmission + " tries");
         } else {
 
         }
@@ -39,9 +40,9 @@ public class SendPacket implements Runnable {
         if (nBytes == sendData.length) {
             return new DatagramPacket(sendData, sendData.length, packet.getDestinationIP(), packet.getDestinationPort());
         } else {
+            System.out.println("Size of packet wasn't good");
             return null;
         }
-
     }
 
     private int sendPacket(DatagramPacket datagramPacket) {
@@ -50,14 +51,14 @@ public class SendPacket implements Runnable {
 
         while (!ackReceived) {
             host.send(datagramPacket);
-            System.out.println("Packet send");
+            System.out.println("Packet | " + packet.getTaskNo() + Protocol.DELIMITER + packet.getSequenceNo() + " | send");
             nTransmissions++;
             long startTime = System.currentTimeMillis();
             long endTime = startTime + Protocol.TIMEOUT;
 
             while (!ackReceived && System.currentTimeMillis() < endTime) {
                 if (host.hasAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo())) {
-                    host.removeAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo());
+                    host.receivedAck(this.packet.getDestinationIP(), this.packet.getDestinationPort(), this.packet.getTaskNo(), this.packet.getSequenceNo());
                     ackReceived = true;
                 }
                 try {

@@ -39,13 +39,13 @@ class Server extends Host {
             byte[] byteMessage = getMessage(receivePacket);
             showInfo(byteMessage);
 
-            new Thread(new ReceivePacket(receivePacket)).start();
+            new Thread(new ReceivePacket(this, receivePacket)).start();
         }
     }
 
     private void showInfo(byte[] message) {
-        System.out.println("FROM CLIENT: " + message.length + " bytes");
-        System.out.println("MESSAGE TO STRING: " + new String(message));
+        // System.out.println("FROM CLIENT: " + message.length + " bytes");
+        // System.out.println("MESSAGE TO STRING: " + new String(message));
     }
 
     private byte[] getMessage(DatagramPacket datagramPacket) {

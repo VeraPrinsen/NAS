@@ -26,6 +26,7 @@ public class CommandHandler {
     }
 
     public static void testSmallPacket(Host host) {
+        host.clearAcks();
         String command = Protocol.SENDDATA;
         InetAddress destinationIP = Protocol.getDefaultIp();
         int destinationPort = Protocol.DEFAULT_SERVER_PORT;
@@ -37,6 +38,7 @@ public class CommandHandler {
     }
 
     public static void testLargePacket(Host host) {
+        host.clearAcks();
         String command = Protocol.SENDDATA;
         InetAddress destinationIP = Protocol.getDefaultIp();
         int destinationPort = Protocol.DEFAULT_SERVER_PORT;

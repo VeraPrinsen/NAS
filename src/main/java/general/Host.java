@@ -11,33 +11,37 @@ import java.util.List;
 public class Host {
 
     private DatagramSocket hostSocket;
-    private List<String> expectedAcks;
+    private List<String> receivedAcks;
     // een lijst waarin de taskNo's worden opgeslagen
 
     public Host () {
-        expectedAcks = new ArrayList<>();
+        receivedAcks = new ArrayList<>();
     }
 
-    public void addAck(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
-        String newAck = getAckString(sourceIP, sourcePort, taskNo, sequenceNo);
-        expectedAcks.add(newAck);
-    }
-
-    public void removeAck(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
+    public void receivedAck(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
         String receivedAck = getAckString(sourceIP, sourcePort, taskNo, sequenceNo);
-        boolean listContainsAck = expectedAcks.contains(receivedAck);
-        if (listContainsAck) {
-            expectedAcks.remove(receivedAck);
+        if (receivedAcks.add(receivedAck)) {
+            System.out.println("Ack | " + receivedAck + " | added to the received list");
         }
     }
 
     public boolean hasAck(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
         String requestedAck = getAckString(sourceIP, sourcePort, taskNo, sequenceNo);
-        return expectedAcks.contains(requestedAck);
+//        if (!receivedAcks.contains(requestedAck)) {
+//            System.out.println(requestedAck + " has not been received yet:");
+//            showList();
+//        }
+
+        return receivedAcks.contains(requestedAck);
     }
 
-    private String getAckString(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
-        return sourceIP.toString() + Protocol.DELIMITER + sourcePort + Protocol.DELIMITER + taskNo + Protocol.DELIMITER + sequenceNo;
+    public String getAckString(InetAddress sourceIP, int sourcePort, int taskNo, int sequenceNo) {
+        // return sourceIP.toString() + Protocol.DELIMITER + sourcePort + Protocol.DELIMITER + taskNo + Protocol.DELIMITER + sequenceNo;
+        return taskNo + Protocol.DELIMITER + sequenceNo;
+    }
+
+    public void clearAcks() {
+        // receivedAcks.clear();
     }
 
     public void send(DatagramPacket datagramPacket) {
@@ -65,6 +69,12 @@ public class Host {
             this.hostSocket = new DatagramSocket(portNumber);
         } catch (SocketException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void showList() {
+        for (String s : receivedAcks) {
+            System.out.println(s);
         }
     }
 }

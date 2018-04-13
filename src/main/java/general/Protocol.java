@@ -12,7 +12,7 @@ public class Protocol {
 
     public static final int FIRSTINDEX_SEQUENCECMD = 2;
     public static final int LASTINDEX_SEQUENCECMD = 3;
-    public static final int SEQUENCECMDSIZE = LASTINDEX_SEQUENCECMD - LASTINDEX_SEQUENCECMD + 1;
+    public static final int SEQUENCECMDSIZE = LASTINDEX_SEQUENCECMD - FIRSTINDEX_SEQUENCECMD + 1;
 
     public static final int FIRSTINDEX_TASK = 4;
     public static final int LASTINDEX_TASK = 4;
@@ -51,7 +51,7 @@ public class Protocol {
 
 
     // Other info
-    public static final int maxPacketSize = 50;
+    public static final int maxPacketSize = 100;
     public static final int maxDataSize = maxPacketSize - HEADERSIZE;  // maximum size of packet in bytes (without header)
     public static final int maxTaskNo = 2^(TASKSIZE * 8);            // maximum task number (1 byte)
     public static final int maxSequenceNo = 2^(SEQUENCESIZE * 8);   // maximum sequence number (1 byte)
@@ -65,8 +65,8 @@ public class Protocol {
     public static final int DEFAULT_CLIENT_PORT = 4567;
     public static InetAddress getDefaultIp() {
         try {
-            // return InetAddress.getByName("192.168.1.1");
-            return InetAddress.getByName("localhost");
+            return InetAddress.getByName("192.168.1.1");
+            // return InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return null;

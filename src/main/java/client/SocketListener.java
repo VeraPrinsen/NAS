@@ -1,5 +1,6 @@
 package client;
 
+import general.Host;
 import general.Protocol;
 import packagecontrol.ReceivePacket;
 
@@ -9,22 +10,24 @@ import java.net.DatagramSocket;
 
 public class SocketListener implements Runnable {
 
-    private DatagramSocket hostSocket;
+    private Client client;
 
     public SocketListener(Client client) {
-        this.hostSocket = client.getHostSocket();
+        this.client = client;
     }
 
     public void run() {
-        byte[] buffer = new byte[Protocol.maxPacketSize]; // empty buffer
-        DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
-        try {
-            hostSocket.receive(receivePacket);
-        } catch (IOException e) {
-            // when connection is closed?
-            e.printStackTrace();
-        }
+        while (true) {
+            byte[] buffer = new byte[Protocol.maxPacketSize]; // empty buffer
+            DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
+            try {
+                client.getHostSocket().receive(receivePacket);
+            } catch (IOException e) {
+                // when connection is closed?
+                e.printStackTrace();
+            }
 
-        new Thread(new ReceivePacket(receivePacket)).start();
+            new Thread(new ReceivePacket(client, receivePacket)).start();
+        }
     }
 }
