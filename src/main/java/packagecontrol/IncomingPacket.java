@@ -17,8 +17,10 @@ public class IncomingPacket {
 
     private String command;
     private String sequenceCmd;
+    private int LAF;
     private int taskNo;
     private int sequenceNo;
+    private int totalSequenceNo;
     private byte[] packetSize;
     private byte[] checkSum;
     private byte[] data;
@@ -35,6 +37,7 @@ public class IncomingPacket {
 
         this.command = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_COMMAND, Protocol.LASTINDEX_COMMAND+1));
         this.sequenceCmd = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCECMD, Protocol.LASTINDEX_SEQUENCECMD+1));
+        this.LAF = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_LAF, Protocol.LASTINDEX_LAF+1));
         this.taskNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_TASK, Protocol.LASTINDEX_TASK+1));
         this.sequenceNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCE, Protocol.LASTINDEX_SEQUENCE+1));
         this.packetSize = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_PACKETSIZE, Protocol.LASTINDEX_PACKETSIZE+1);
@@ -59,6 +62,10 @@ public class IncomingPacket {
         return byteMessage;
     }
 
+    public void setTotalSequenceNo(int totalSequenceNo) {
+        this.totalSequenceNo = totalSequenceNo;
+    }
+
     public InetAddress getSourceIP() {
         return sourceIP;
     }
@@ -75,12 +82,20 @@ public class IncomingPacket {
         return this.sequenceCmd;
     }
 
+    public int getLAF() {
+        return this.LAF;
+    }
+
     public int getTaskNo() {
         return taskNo;
     }
 
     public int getSequenceNo() {
         return sequenceNo;
+    }
+
+    public int getTotalSequenceNo() {
+        return totalSequenceNo;
     }
 
     public byte[] getPacketSize() {

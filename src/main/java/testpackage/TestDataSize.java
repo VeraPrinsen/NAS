@@ -1,32 +1,10 @@
-package client;
+package testpackage;
 
-import general.Host;
 import general.Protocol;
-import packagecontrol.OutgoingData;
-import packagecontrol.Task;
 
-import java.net.InetAddress;
+public class TestDataSize {
 
-public class CommandHandler {
-
-    public static void help() {
-
-    }
-
-    public static void download() {
-        TextResources.Download.askForFile();
-    }
-
-    public static void upload() {
-
-    }
-
-    public static void fileList(Host host) {
-        // testExtraLargeData
-        String command = Protocol.SENDDATA;
-        InetAddress destinationIP = Protocol.getDefaultIp();
-        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
-        int taskNo = host.getAckController().getNewTask();
+    public static void main(String[] args) {
         String sentence = "Vanaf het moment dat Harry Potter achter gelaten wordt op de deurmat bij zijn oom en tante, zonder te weten dat hij beroemd was, wordt er een grote tijdsprong gemaakt. Van de eenjarige die net uit het puin van zijn ouderlijk huis is gered gaan we naar een tienjarige Harry Potter die op hardhandige wijze gewekt wordt door zijn tante.\n" +
                 "\n" +
                 "In het huis van de Duffelingen lijkt niet te zijn veranderd, het enige waaraan te zien is dat er tijd is verstreken zijn de rijen foto’s op de schoorsteenmantel.\n" +
@@ -48,36 +26,8 @@ public class CommandHandler {
 
         sentence = sentence.concat(sentence);
         byte[] data = sentence.getBytes();
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
-    }
-
-    public static void testSmallPacket(Host host) {
-        String command = Protocol.SENDDATA;
-        InetAddress destinationIP = Protocol.getDefaultIp();
-        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
-        int taskNo = host.getAckController().getNewTask();
-        byte[] data = "Dit is een stuk data".getBytes();
-
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
-    }
-
-    public static void testLargePacket(Host host) {
-        String command = Protocol.SENDDATA;
-        InetAddress destinationIP = Protocol.getDefaultIp();
-        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
-        int taskNo = host.getAckController().getNewTask();
-        String sentence = "Vanaf het moment dat Harry Potter achter gelaten wordt op de deurmat bij zijn oom en tante, zonder te weten dat hij beroemd was, wordt er een grote tijdsprong gemaakt. Van de eenjarige die net uit het puin van zijn ouderlijk huis is gered gaan we naar een tienjarige Harry Potter die op hardhandige wijze gewekt wordt door zijn tante.\n" +
-                "\n" +
-                "In het huis van de Duffelingen lijkt niet te zijn veranderd, het enige waaraan te zien is dat er tijd is verstreken zijn de rijen foto’s op de schoorsteenmantel.\n" +
-                "Tien jaar geleden hadden er foto’s gestaan van iets wat verdacht veel op een roze strandbal, met verschillende kleuren gebreide mutsjes op, had geleden. Nu stonden er foto’s van een enorm dik, blond jongentje dat op zijn eerste fiets reed, in een draaimolen zat, een computer spelletje speelde met zijn vader en geknuffeld en gekust werd door zijn moeder. Dirk Duffeling was overduidelijk geen baby meer.";
-        byte[] data = sentence.getBytes();
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
+        System.out.println(data.length / Protocol.maxDataSize);
+        System.out.println(sentence);
     }
 
 }

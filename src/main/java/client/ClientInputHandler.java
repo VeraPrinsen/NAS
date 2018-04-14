@@ -27,7 +27,7 @@ public class ClientInputHandler {
                 break;
 
             case 3:
-                CommandHandler.fileList();
+                CommandHandler.fileList(client);
                 break;
 
             case 4:

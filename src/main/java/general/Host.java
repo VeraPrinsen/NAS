@@ -21,6 +21,7 @@ public class Host {
     public Host () {
         ackController = new AckController();
         taskController = new TaskController(this);
+        new Thread(taskController).start();
     }
 
     public void send(DatagramPacket datagramPacket) {

@@ -31,12 +31,13 @@ public class SendPacket implements Runnable {
 
         byte[] bCommand = packet.getCommand().getBytes();
         byte[] bSequenceCmd = packet.getSequenceCmd().getBytes();
+        byte[] bLAF = new byte[Protocol.LAFSIZE];
         byte[] bTask = Utils.intToByteArray(packet.getTaskNo(), Protocol.TASKSIZE);
         byte[] bSequence = Utils.intToByteArray(packet.getSequenceNo(), Protocol.SEQUENCESIZE);
         byte[] bTotalBytes = new byte[Protocol.PACKETSIZESIZE];
         byte[] bChecksum = new byte[Protocol.CHECKSUMSIZE];
 
-        byte[] sendData = Utils.byteConcat(bCommand, bSequenceCmd, bTask ,bSequence, bTotalBytes, bChecksum, packet.getData());
+        byte[] sendData = Utils.byteConcat(bCommand, bSequenceCmd, bLAF, bTask ,bSequence, bTotalBytes, bChecksum, packet.getData());
         if (nBytes == sendData.length) {
             return new DatagramPacket(sendData, sendData.length, packet.getDestinationIP(), packet.getDestinationPort());
         } else {

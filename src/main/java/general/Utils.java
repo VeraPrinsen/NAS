@@ -40,7 +40,7 @@ public class Utils {
     }
 
     public static byte[] intToByteArray(int value, int nBytes) {
-        if ((2^(nBytes*8)) > value-1) {
+        if (Math.pow(2,nBytes*8) > value-1) {
             byte[] tempByte = new byte[nBytes];
             for (int i = 0; i < nBytes; i++) {
                 tempByte[i] = (byte) ((value >> 8*(nBytes-i-1)) & 0xFF);

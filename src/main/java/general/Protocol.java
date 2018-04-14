@@ -14,24 +14,28 @@ public class Protocol {
     public static final int LASTINDEX_SEQUENCECMD = 3;
     public static final int SEQUENCECMDSIZE = LASTINDEX_SEQUENCECMD - FIRSTINDEX_SEQUENCECMD + 1;
 
-    public static final int FIRSTINDEX_TASK = 4;
-    public static final int LASTINDEX_TASK = 4;
+    public static final int FIRSTINDEX_LAF = 4;
+    public static final int LASTINDEX_LAF = 4;
+    public static final int LAFSIZE = LASTINDEX_LAF - FIRSTINDEX_LAF + 1;
+
+    public static final int FIRSTINDEX_TASK = 5;
+    public static final int LASTINDEX_TASK = 5;
     public static final int TASKSIZE = LASTINDEX_TASK - FIRSTINDEX_TASK + 1;
 
-    public static final int FIRSTINDEX_SEQUENCE = 5;
-    public static final int LASTINDEX_SEQUENCE = 5;
+    public static final int FIRSTINDEX_SEQUENCE = 6;
+    public static final int LASTINDEX_SEQUENCE = 6;
     public static final int SEQUENCESIZE = LASTINDEX_SEQUENCE - FIRSTINDEX_SEQUENCE + 1;
 
-    public static final int FIRSTINDEX_PACKETSIZE = 6;
-    public static final int LASTINDEX_PACKETSIZE = 7;
+    public static final int FIRSTINDEX_PACKETSIZE = 7;
+    public static final int LASTINDEX_PACKETSIZE = 8;
     public static final int PACKETSIZESIZE = LASTINDEX_PACKETSIZE - FIRSTINDEX_PACKETSIZE + 1;
 
-    public static final int FIRSTINDEX_CHECKSUM = 8;
-    public static final int LASTINDEX_CHECKSUM = 8;
+    public static final int FIRSTINDEX_CHECKSUM = 9;
+    public static final int LASTINDEX_CHECKSUM = 9;
     public static final int CHECKSUMSIZE = LASTINDEX_CHECKSUM - FIRSTINDEX_CHECKSUM + 1;
 
-    public static final int FIRSTINDEX_DATA = 9;
-    public static final int HEADERSIZE = COMMANDSIZE + SEQUENCECMDSIZE + TASKSIZE + SEQUENCESIZE + PACKETSIZESIZE + CHECKSUMSIZE;
+    public static final int FIRSTINDEX_DATA = 10;
+    public static final int HEADERSIZE = COMMANDSIZE + SEQUENCECMDSIZE + LAFSIZE + TASKSIZE + SEQUENCESIZE + PACKETSIZESIZE + CHECKSUMSIZE;
 
     // COMMANDS (2 bytes)
     public static final String DOWNLOAD = "DL";
@@ -51,14 +55,13 @@ public class Protocol {
 
 
     // Other info
-    public static final int maxPacketSize = 100;
+    public static final int maxPacketSize = 50;
     public static final int maxDataSize = maxPacketSize - HEADERSIZE;  // maximum size of packet in bytes (without header)
-    public static final int maxTaskNo = 2^(TASKSIZE * 8);            // maximum task number (1 byte)
-    public static final int maxSequenceNo = 2^(SEQUENCESIZE * 8);   // maximum sequence number (1 byte)
+    public static final int maxTaskNo = (int) Math.pow(2, TASKSIZE*8);            // maximum task number (1 byte)
+    //public static final int maxSequenceNo = (int) Math.pow(2, SEQUENCESIZE*8);   // maximum sequence number (1 byte)
+    public static final int maxSequenceNo = 100;
     public static final int TIMEOUT = 3000;                 // Timeout for Acknowledgement (in ms)
-    public static final int SWS = 100;                      // Send Window Size (# packets)
-    public static final int RWS = 50;                       // Receive Window Size (# packets)
-
+    public static final int WS = 20;                      // Send Window Size (# packets)
 
     public static final String DELIMITER = "_";
     public static final int DEFAULT_SERVER_PORT = 9876;
