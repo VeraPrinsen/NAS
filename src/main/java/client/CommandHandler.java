@@ -1,27 +1,87 @@
 package client;
 
+import fileoperators.FileReaderClass;
+import fileoperators.FileChooserClass;
 import general.Host;
 import general.Protocol;
 import packagecontrol.OutgoingData;
 import packagecontrol.Task;
 
+import java.io.File;
 import java.net.InetAddress;
 
+// TODO: Implement tasks Client input
 public class CommandHandler {
 
-    public static void help() {
+    public static void download(Host host) {
 
     }
 
-    public static void download() {
-        TextResources.Download.askForFile();
-    }
+    public static void upload(Host host) {
+        FileChooserClass chooser = new FileChooserClass();
+        try {
+            chooser.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File file = chooser.getFile();
+        String fileName = file.getAbsolutePath();
+        byte[] data = FileReaderClass.fileToByteArray(fileName);
+        int fileSize = data.length;
 
-    public static void upload() {
+        String dataSentence = fileName + Protocol.DELIMITER + fileSize;
+        byte[] dataBytes = dataSentence.getBytes();
 
+        String command = Protocol.UPLOAD;
+        InetAddress destinationIP = Protocol.getDefaultIp();
+        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
+        int taskNo = host.getAckController().getNewTask();
+
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, dataBytes);
+        host.getAckController().addTask(taskNo);
+        new Thread(new Task(host, outgoingData)).start();
     }
 
     public static void fileList(Host host) {
+        String command = Protocol.ASKFILELIST;
+        InetAddress destinationIP = Protocol.getDefaultIp();
+        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
+        int taskNo = host.getAckController().getNewTask();
+        byte[] data = new byte[0];
+
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
+        host.getAckController().addTask(taskNo);
+        new Thread(new Task(host, outgoingData)).start();
+    }
+
+    public static void testSmallData(Host host) {
+        String command = Protocol.SENDDATA;
+        InetAddress destinationIP = Protocol.getDefaultIp();
+        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
+        int taskNo = host.getAckController().getNewTask();
+        byte[] data = "Dit is een stuk data".getBytes();
+
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
+        host.getAckController().addTask(taskNo);
+        new Thread(new Task(host, outgoingData)).start();
+    }
+
+    public static void testLargeData(Host host) {
+        String command = Protocol.SENDDATA;
+        InetAddress destinationIP = Protocol.getDefaultIp();
+        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
+        int taskNo = host.getAckController().getNewTask();
+        String sentence = "Vanaf het moment dat Harry Potter achter gelaten wordt op de deurmat bij zijn oom en tante, zonder te weten dat hij beroemd was, wordt er een grote tijdsprong gemaakt. Van de eenjarige die net uit het puin van zijn ouderlijk huis is gered gaan we naar een tienjarige Harry Potter die op hardhandige wijze gewekt wordt door zijn tante.\n" +
+                "\n" +
+                "In het huis van de Duffelingen lijkt niet te zijn veranderd, het enige waaraan te zien is dat er tijd is verstreken zijn de rijen foto’s op de schoorsteenmantel.\n" +
+                "Tien jaar geleden hadden er foto’s gestaan van iets wat verdacht veel op een roze strandbal, met verschillende kleuren gebreide mutsjes op, had geleden. Nu stonden er foto’s van een enorm dik, blond jongentje dat op zijn eerste fiets reed, in een draaimolen zat, een computer spelletje speelde met zijn vader en geknuffeld en gekust werd door zijn moeder. Dirk Duffeling was overduidelijk geen baby meer.";
+        byte[] data = sentence.getBytes();
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
+        host.getAckController().addTask(taskNo);
+        new Thread(new Task(host, outgoingData)).start();
+    }
+
+    public static void textExtraLargeData(Host host) {
         // testExtraLargeData
         String command = Protocol.SENDDATA;
         InetAddress destinationIP = Protocol.getDefaultIp();
@@ -53,28 +113,21 @@ public class CommandHandler {
         new Thread(new Task(host, outgoingData)).start();
     }
 
-    public static void testSmallPacket(Host host) {
+    public static void testFileData(Host host) {
+        FileChooserClass chooser = new FileChooserClass();
+        try {
+            chooser.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        File file = chooser.getFile();
+        byte[] data = FileReaderClass.fileToByteArray(file.getAbsolutePath());
+
         String command = Protocol.SENDDATA;
         InetAddress destinationIP = Protocol.getDefaultIp();
         int destinationPort = Protocol.DEFAULT_SERVER_PORT;
         int taskNo = host.getAckController().getNewTask();
-        byte[] data = "Dit is een stuk data".getBytes();
 
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
-    }
-
-    public static void testLargePacket(Host host) {
-        String command = Protocol.SENDDATA;
-        InetAddress destinationIP = Protocol.getDefaultIp();
-        int destinationPort = Protocol.DEFAULT_SERVER_PORT;
-        int taskNo = host.getAckController().getNewTask();
-        String sentence = "Vanaf het moment dat Harry Potter achter gelaten wordt op de deurmat bij zijn oom en tante, zonder te weten dat hij beroemd was, wordt er een grote tijdsprong gemaakt. Van de eenjarige die net uit het puin van zijn ouderlijk huis is gered gaan we naar een tienjarige Harry Potter die op hardhandige wijze gewekt wordt door zijn tante.\n" +
-                "\n" +
-                "In het huis van de Duffelingen lijkt niet te zijn veranderd, het enige waaraan te zien is dat er tijd is verstreken zijn de rijen foto’s op de schoorsteenmantel.\n" +
-                "Tien jaar geleden hadden er foto’s gestaan van iets wat verdacht veel op een roze strandbal, met verschillende kleuren gebreide mutsjes op, had geleden. Nu stonden er foto’s van een enorm dik, blond jongentje dat op zijn eerste fiets reed, in een draaimolen zat, een computer spelletje speelde met zijn vader en geknuffeld en gekust werd door zijn moeder. Dirk Duffeling was overduidelijk geen baby meer.";
-        byte[] data = sentence.getBytes();
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
         host.getAckController().addTask(taskNo);
         new Thread(new Task(host, outgoingData)).start();

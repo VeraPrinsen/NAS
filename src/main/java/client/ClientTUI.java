@@ -61,28 +61,4 @@ public class ClientTUI {
 
         return input;
     }
-
-
-
-
-
-
-
-
-//    // CAN GO?
-//    public void run() {
-//        String msg;
-//        try {
-//            msg = in.readLine();
-//            while (msg != null) {
-//                print("Your message: " + msg);
-//                (new Thread(new ClientInputHandler(msg))).start();
-//                msg = in.readLine();
-//            }
-//        } catch (IOException e) {
-//            // inputStream will be closed, program is closing, do nothing..
-//        }
-//
-//    }
-
 }

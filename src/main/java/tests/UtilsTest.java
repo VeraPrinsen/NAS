@@ -50,8 +50,18 @@ public class UtilsTest {
         int a = 10;
         byte[] b = Utils.intToByteArray(a, 1);
         byte[] aByte = new byte[1];
-        aByte[0] = 0b0001010;
+        aByte[0] = 0b00001010;
 
         Assert.assertArrayEquals(aByte, b);
+
+
+        int c = 266;
+        byte[] d = Utils.intToByteArray(c, 2);
+        byte[] cByte = new byte[2];
+        cByte[1] = 0b00001010;
+        cByte[0] = 0b00000001;
+
+        Assert.assertArrayEquals(cByte, d);
+
     }
 }

@@ -22,7 +22,6 @@ public class Task implements Runnable {
     private void sendPackets() {
         int nPackets = (data.getData().length / Protocol.maxDataSize) + 1;
         int totalSequenceNo = 0;
-        System.out.println("Total packets: " + nPackets);
 
         int LAR = -1;
         int LFS = -1;
@@ -62,9 +61,9 @@ public class Task implements Runnable {
             }
 
             OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, totalSequenceNo % Protocol.maxSequenceNo);
-            System.out.println(totalSequenceNo + ": " + new String(packet));
             new Thread(new SendPacket(host, outgoingPacket)).start();
             host.getAckController().sendPacket(outgoingPacket.getTaskNo(), totalSequenceNo);
+
             LFS = totalSequenceNo;
             totalSequenceNo++;
         }

@@ -4,6 +4,7 @@ import packagecontrol.OutgoingData;
 
 import java.net.DatagramPacket;
 
+// TODO: What to do with client commands?
 public class CommandHandler {
 
     public static void download() {

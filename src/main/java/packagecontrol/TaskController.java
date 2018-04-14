@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+// TODO: Clean up
+// TODO: Receiving packets goes to quick for the LFR and LAF to keep up. Maybe some wait() and notify() ?
+// TODO: If a task was removed, and another packet comes in, do not make a new task.
 public class TaskController implements Runnable {
 
     private Host host;
@@ -59,7 +62,6 @@ public class TaskController implements Runnable {
     private void sendAck(IncomingPacket incomingPacket) {
         DatagramPacket newAck = createAckPacket(incomingPacket);
         sendPacket(newAck);
-        System.out.println("Ack | " + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + " | send to " + incomingPacket.getSourceIP() + " " + incomingPacket.getSourcePort());
     }
 
     private DatagramPacket createAckPacket(IncomingPacket incomingPacket) {
@@ -116,7 +118,6 @@ public class TaskController implements Runnable {
             totalSequenceNo = getTotalSequenceNo(taskNo, incomingPacket.getSequenceNo());
         }
 
-        System.out.println(incomingPacket.getSourceIP() + "/" + incomingPacket.getSourcePort() + ": " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + totalSequenceNo + " received");
         if (totalSequenceNo != -1) {
             if (!taskExists(taskNo)) {
                 addTask(taskNo);
@@ -124,10 +125,8 @@ public class TaskController implements Runnable {
             sendAck(incomingPacket);
 
             incomingPacket.setTotalSequenceNo(totalSequenceNo);
-            System.out.println(totalSequenceNo);
             packetsReceived.get(taskNo).add(incomingPacket);
             sequenceReceived.get(taskNo).add(totalSequenceNo);
-            System.out.println(totalSequenceNo + " added, total: " + sequenceReceived.get(taskNo).size());
 
             if (incomingPacket.getSequenceCmd().equals(Protocol.SINGLE)) {
                 packetFirstReceived.replace(taskNo, totalSequenceNo);
@@ -176,8 +175,6 @@ public class TaskController implements Runnable {
 
     private void update() {
         for (Integer taskNo : getTasks()) {
-            System.out.println("Update for task " + taskNo);
-            System.out.println("LastFrameReceived: " + packetLFR.get(taskNo) + "-" + packetTotalLFR.get(taskNo) + ", LastAcceptableFrame: " + packetLAF.get(taskNo) + "-" + packetTotalLAF.get(taskNo));
             int totalLFR = packetTotalLFR.get(taskNo);
             int nextLFR = totalLFR + 1;
 
@@ -201,15 +198,17 @@ public class TaskController implements Runnable {
             if (LAFchanged) {
                 DatagramPacket LAFPacket = createLAFPacket(taskNo);
                 sendPacket(LAFPacket);
-                System.out.println("Extra LAF packet send");
-
             }
 
             if (packetFirstReceived.get(taskNo) >= 0 && packetLastReceived.get(taskNo) >= 0) {
                 if (isFinished(taskNo)) {
                     // do something
-                    System.out.println("All packets received");
-                    new Thread(new DataAssembler(packetsReceived.get(taskNo))).start();
+                    new Thread(new DataAssembler(host, packetsReceived.get(taskNo))).start();
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     removeTask(taskNo);
                 }
             }
@@ -257,7 +256,6 @@ public class TaskController implements Runnable {
         packetFirstReceived.remove(taskNo);
         packetLastReceived.remove(taskNo);
 
-        System.out.println("Task " + taskNo + " removed");
         pauseUpdates = false;
     }
 

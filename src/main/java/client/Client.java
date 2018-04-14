@@ -3,7 +3,7 @@ package client;
 import general.Protocol;
 import general.Host;
 
-class Client extends Host {
+public class Client extends Host {
 
     private ClientTUI clientTUI;
     private boolean keepGoing = true;

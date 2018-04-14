@@ -5,6 +5,7 @@ import general.Protocol;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+// TODO: Clean up
 public class AckController {
 
     private HashMap<Integer, ArrayList<String>> receivedAcks;
@@ -15,6 +16,7 @@ public class AckController {
     private HashMap<Integer, Integer> ackTotalLAR;
     private HashMap<Integer, Integer> ackTotalLFS;
     private HashMap<Integer, Integer> receiverTotalLAF;
+    private int currentTaskNo;
 
     public AckController() {
         receivedAcks = new HashMap<>();
@@ -25,6 +27,8 @@ public class AckController {
         ackTotalLAR = new HashMap<>();
         ackTotalLFS = new HashMap<>();
         receiverTotalLAF = new HashMap<>();
+
+        currentTaskNo = 0;
     }
 
     // When a host begins transmitting a new task, this is made to control the acks that will come back
@@ -49,7 +53,6 @@ public class AckController {
     }
 
     public boolean canSend(int taskNo, int totalSequenceNo) {
-        System.out.println(totalSequenceNo + "-" + receiverTotalLAF.get(taskNo));
         return totalSequenceNo > ackTotalLAR.get(taskNo) && totalSequenceNo <= (ackTotalLAR.get(taskNo) + Protocol.WS) && totalSequenceNo <= receiverTotalLAF.get(taskNo);
     }
 
@@ -61,11 +64,9 @@ public class AckController {
 
         if (taskExists(taskNo)) {
             int totalSequenceNo = getTotalSequenceNo(taskNo, sequenceNo);
-            System.out.println("LAF check: " + receiverTotalLAF.get(taskNo) + "-" + getLAFTotalSequenceNo(taskNo, incomingPacket.getLAF()));
             if (receiverTotalLAF.get(taskNo) < getLAFTotalSequenceNo(taskNo, incomingPacket.getLAF())) {
                 receiverLAF.replace(taskNo, incomingPacket.getLAF());
                 receiverTotalLAF.replace(taskNo, getLAFTotalSequenceNo(taskNo, incomingPacket.getLAF()));
-                System.out.println("Does this happen?");
             }
 
             if (totalSequenceNo != -1) {
@@ -128,6 +129,7 @@ public class AckController {
     }
 
     // TODO: Make this more elegant
+    // TODO: Sometimes program gets still stuck, fix it!!
     private int getLAFTotalSequenceNo(int taskNo, int sequenceNo) {
         int LAR = ackLAR.get(taskNo);
         int LFS = ackLFS.get(taskNo);
@@ -184,12 +186,11 @@ public class AckController {
     }
 
     public int getNewTask() {
-        int i = 0;
         while (true) {
-            if (taskExists(i)) {
-                i++;
+            if (taskExists(currentTaskNo)) {
+                currentTaskNo = (currentTaskNo + 1) % Protocol.maxTaskNo;
             } else {
-                return i;
+                return currentTaskNo;
             }
         }
     }

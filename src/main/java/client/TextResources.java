@@ -1,5 +1,11 @@
 package client;
 
+import fileoperators.FileReaderClass;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+
 public class TextResources {
 
     public static class General {
@@ -40,9 +46,6 @@ public class TextResources {
 
     public static class Download {
 
-        public static void askForFile() {
-            //
-        }
     }
 
     private static void prt(String msg) {

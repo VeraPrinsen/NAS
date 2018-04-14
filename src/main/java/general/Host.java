@@ -27,6 +27,7 @@ public class Host {
     public void send(DatagramPacket datagramPacket) {
         try {
             hostSocket.send(datagramPacket);
+            System.out.println(datagramPacket.getAddress().toString() + "/" + datagramPacket.getPort() + " | " + new String(datagramPacket.getData()) + " send");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,6 +45,7 @@ public class Host {
         return taskController;
     }
 
+    // TODO: remove when not used
     public void createSocket() {
         try {
             this.hostSocket = new DatagramSocket();

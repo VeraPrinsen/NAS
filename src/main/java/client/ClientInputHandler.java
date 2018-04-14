@@ -12,6 +12,7 @@ public class ClientInputHandler {
         start();
     }
 
+    // TODO: Make tasks for client input commands
     private void start() {
         switch (choice) {
             case 0:
@@ -19,11 +20,11 @@ public class ClientInputHandler {
                 break;
 
             case 1:
-                CommandHandler.download();
+                CommandHandler.download(client);
                 break;
 
             case 2:
-                CommandHandler.upload();
+                CommandHandler.upload(client);
                 break;
 
             case 3:
@@ -31,11 +32,11 @@ public class ClientInputHandler {
                 break;
 
             case 4:
-                CommandHandler.testSmallPacket(client);
+                CommandHandler.testSmallData(client);
                 break;
 
             case 5:
-                CommandHandler.testLargePacket(client);
+                CommandHandler.testLargeData(client);
                 break;
 
             default:

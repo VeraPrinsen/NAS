@@ -27,11 +27,11 @@ public class SocketListener implements Runnable {
             }
 
             IncomingPacket incomingPacket = new IncomingPacket(receivePacket);
+            showInfo(incomingPacket);
 
             switch (incomingPacket.getCommand()) {
                 case Protocol.ACK_OK:
                 case Protocol.ACK_DENIED:
-                    showInfo(incomingPacket);
                     host.getAckController().receivedAck(incomingPacket);
                     break;
 
@@ -39,12 +39,10 @@ public class SocketListener implements Runnable {
                     host.getTaskController().doSomething(incomingPacket);
                     break;
             }
-
-            //new Thread(new ReceivePacket(client, receivePacket)).start();
         }
     }
 
     private void showInfo(IncomingPacket packet) {
-        System.out.println(packet.getSourceIP() + "/" + packet.getSourcePort() + ": " + packet.getCommand() + "-" + packet.getSequenceCmd() + "-" + packet.getLAF() + "-" + packet.getTaskNo() + "-" + packet.getSequenceNo() + " received");
+        System.out.println(packet.getSourceIP() + "/" + packet.getSourcePort() + " | " + packet.getCommand() +  "-" + packet.getTaskNo() + "-" + packet.getSequenceNo() + " received");
     }
 }

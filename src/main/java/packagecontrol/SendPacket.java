@@ -11,6 +11,7 @@ public class SendPacket implements Runnable {
     private Host host;
     private OutgoingPacket packet;
 
+    // TODO: Clean up
     public SendPacket(Host host, OutgoingPacket outgoingPacket) {
         this.host = host;
         this.packet = outgoingPacket;
@@ -20,7 +21,6 @@ public class SendPacket implements Runnable {
         DatagramPacket datagramPacket = createPacket();
         if (datagramPacket != null) {
             int transmission = sendPacket(datagramPacket);
-            System.out.println("Packet | " + host.getAckController().ackString(this.packet.getTaskNo(), this.packet.getSequenceNo()) + " | send in " + transmission + " tries");
         } else {
 
         }
@@ -52,7 +52,6 @@ public class SendPacket implements Runnable {
 
         while (!ackReceived) {
             host.send(datagramPacket);
-            System.out.println("Packet | " + packet.getTaskNo() + Protocol.DELIMITER + packet.getSequenceNo() + " | send");
             nTransmissions++;
             long startTime = System.currentTimeMillis();
             long endTime = startTime + Protocol.TIMEOUT;
