@@ -9,7 +9,7 @@ public class FileWriterClass {
     public static void byteArrayToFile(byte[] bArray, String outputFilename) {
         OutputStream out = null;
         try {
-            out = new FileOutputStream(outputFilename);
+            out = new FileOutputStream("test.txt");
             out.write(bArray);
             out.close();
         } catch (Exception e) {

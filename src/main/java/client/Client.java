@@ -1,17 +1,33 @@
 package client;
 
 import general.Protocol;
-import general.Host;
+import host.Host;
+import host.SocketListener;
+
+import java.net.InetAddress;
 
 public class Client extends Host {
 
     private ClientTUI clientTUI;
     private boolean keepGoing = true;
 
+    InetAddress serverIP;
+    int serverPort;
+
     public Client() {
         this.clientTUI = new ClientTUI();
         createSocket(Protocol.DEFAULT_CLIENT_PORT);
         new Thread(new SocketListener(this)).start();
+        serverIP = Protocol.getDefaultIp();
+        serverPort = Protocol.DEFAULT_SERVER_PORT;
+    }
+
+    public InetAddress getServerIP() {
+        return serverIP;
+    }
+
+    public int getServerPort() {
+        return serverPort;
     }
 
     /**

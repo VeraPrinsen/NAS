@@ -1,7 +1,7 @@
 package server;
 
 import general.Protocol;
-import packagecontrol.IncomingPacket;
+import incomingpacketcontrol.IncomingPacket;
 
 public class ClientHandler implements Runnable {
 
@@ -14,9 +14,9 @@ public class ClientHandler implements Runnable {
     }
 
     public void run() {
-        if (!(message.getCommand().equals(Protocol.ACK_OK) || message.getCommand().equals(Protocol.ACK_DENIED))) {
-            // If the command was not an ACK_OK or ACK_DENIED, send Ack
-            //CommandHandler.sendAck(message, server);
+        if (!message.getCommand().equals(Protocol.ACK)) {
+            // If the command was not an ACK or ACK_DENIED, send Ack
+            //ClientCommands.sendAck(message, server);
         }
 
         // DO SOMETHING
@@ -53,7 +53,7 @@ public class ClientHandler implements Runnable {
                 break;
 
             default:
-                //CommandHandler.defaultSend(message, server);
+                //ClientCommands.defaultSend(message, server);
                 break;
         }
     }

@@ -2,11 +2,11 @@ package server;
 
 import fileoperators.FileReaderClass;
 import fileoperators.FileWriterClass;
-import general.Host;
+import host.Host;
 import general.Protocol;
 import general.Utils;
-import packagecontrol.OutgoingData;
-import packagecontrol.Task;
+import outgoingpacketcontrol.OutgoingData;
+import outgoingpacketcontrol.Task;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -15,33 +15,35 @@ public class Reactions {
 
     public static void sendUploadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String command = Protocol.UPLOAD_APPROVED;
-        int taskNo = host.getAckController().getNewTask();
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
+        int taskNo = host.getSendingWindow().getNewTask();
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
+        host.getSendingWindow().addTask(taskNo);
         new Thread(new Task(host, outgoingData)).start();
     }
 
     public static void sendDownloadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String command = Protocol.UPLOAD_APPROVED;
-        int taskNo = host.getAckController().getNewTask();
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
+        int taskNo = host.getSendingWindow().getNewTask();
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
+        host.getSendingWindow().addTask(taskNo);
         new Thread(new Task(host, outgoingData)).start();
     }
 
     public static void sendFile(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String dataSentence = new String(data);
         String[] args = dataSentence.split(Protocol.DELIMITER);
-        byte[] dataBytes = FileReaderClass.fileToByteArray(args[0]);
+
+        String fullFileName = host.getExpectedUploads(args[0]);
+        byte[] dataBytes = FileReaderClass.fileToByteArray(fullFileName);
 
         String newDataSentence = dataSentence + Protocol.DELIMITER;
         dataBytes = Utils.concat2byte(newDataSentence.getBytes(), dataBytes);
 
         String command = Protocol.SENDDATA;
-        int taskNo = host.getAckController().getNewTask();
+        int taskNo = host.getSendingWindow().getNewTask();
 
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, dataBytes);
-        host.getAckController().addTask(taskNo);
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, dataBytes, Protocol.WS);
+        host.getSendingWindow().addTask(taskNo);
         new Thread(new Task(host, outgoingData)).start();
     }
 
@@ -70,10 +72,10 @@ public class Reactions {
         byte[] data = message.getBytes();
 
         String command = Protocol.FILELIST;
-        int taskNo = host.getAckController().getNewTask();
+        int taskNo = host.getSendingWindow().getNewTask();
 
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data);
-        host.getAckController().addTask(taskNo);
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
+        host.getSendingWindow().addTask(taskNo);
         new Thread(new Task(host, outgoingData)).start();
     }
 

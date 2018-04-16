@@ -1,6 +1,6 @@
 package server;
 
-import packagecontrol.OutgoingData;
+import outgoingpacketcontrol.OutgoingData;
 
 import java.net.DatagramPacket;
 

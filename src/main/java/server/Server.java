@@ -1,8 +1,8 @@
 package server;
 
-import client.SocketListener;
+import host.SocketListener;
 import general.Protocol;
-import general.Host;
+import host.Host;
 
 // Server doesn't connect with a specific client, it just listens to incoming packets
 // and reacts on them. In this class the listening socket is made and incoming messages

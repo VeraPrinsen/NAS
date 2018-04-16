@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
  *
  * @author vera.prinsen
  */
+// TODO: Clean up EXIT code
 public class ClientTUI {
 
     private BufferedReader in;

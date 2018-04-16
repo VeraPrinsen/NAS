@@ -20,23 +20,23 @@ public class ClientInputHandler {
                 break;
 
             case 1:
-                CommandHandler.download(client);
+                ClientCommands.download(client);
                 break;
 
             case 2:
-                CommandHandler.upload(client);
+                ClientCommands.upload(client);
                 break;
 
             case 3:
-                CommandHandler.fileList(client);
+                ClientCommands.fileList(client);
                 break;
 
             case 4:
-                CommandHandler.testSmallData(client);
+                ClientCommands.testSmallData(client);
                 break;
 
             case 5:
-                CommandHandler.testLargeData(client);
+                ClientCommands.testLargeData(client);
                 break;
 
             default:
