@@ -23,7 +23,7 @@ public class Task implements Runnable {
 
     private void sendPackets() {
         int nPackets;
-        if (data.getData().length % Protocol.maxDataSize == 0) {
+        if ((data.getData().length % Protocol.maxDataSize) == 0) {
             nPackets = (data.getData().length / Protocol.maxDataSize);
         } else {
             nPackets = (data.getData().length / Protocol.maxDataSize) + 1;
@@ -32,9 +32,7 @@ public class Task implements Runnable {
         if (data.isFile()) {
             String packetString = data.getFullFileName() + Protocol.DELIMITER + data.getData().length;
             OutgoingPacket firstOutgoingPacket = new OutgoingPacket(data, Protocol.FIRST, packetString.getBytes(), 0, data.getLAF());
-            new SendPacket(host, firstOutgoingPacket).run();
-
-            nPackets++;
+            new Thread(new SendPacket(host, firstOutgoingPacket)).start();
         }
 
         for (int i = 0; i < nPackets; i++) {
@@ -44,7 +42,7 @@ public class Task implements Runnable {
             }
 
             int endIndex;
-            if (j == nPackets - 1) {
+            if (i == nPackets - 1) {
                 endIndex = data.getData().length;
             } else {
                 endIndex = ((i+1)* Protocol.maxDataSize);
@@ -57,7 +55,7 @@ public class Task implements Runnable {
                 sequenceCmd = Protocol.SINGLE;
             } else if (j == 0) {
                 sequenceCmd = Protocol.FIRST;
-            } else if (j == nPackets - 1) {
+            } else if (i == nPackets - 1) {
                 sequenceCmd = Protocol.LAST;
             } else {
                 sequenceCmd = Protocol.CONTINUE;
@@ -73,8 +71,7 @@ public class Task implements Runnable {
             }
 
             OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, j, data.getLAF());
-            new SendPacket(host, outgoingPacket).run();
-            // new Thread(new SendPacket(host, outgoingPacket)).start();
+            new Thread(new SendPacket(host, outgoingPacket)).start();
         }
     }
 }

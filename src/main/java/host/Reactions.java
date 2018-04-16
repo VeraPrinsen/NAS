@@ -48,7 +48,7 @@ public class Reactions {
 
     public static void saveFile(String fileName, int nBytes, byte[] data) {
         FileWriterClass.byteArrayToFile(data, fileName);
-        System.out.println(fileName + " saved");
+        System.out.println(fileName + " saved (" + nBytes + "-" + data.length + ")");
     }
 
     public static void sendFileList(Host host, InetAddress destinationIP, int destinationPort) {

@@ -57,7 +57,8 @@ public class ClientCommands {
         InetAddress destinationIP = Protocol.getDefaultIp();
         int destinationPort = Protocol.DEFAULT_SERVER_PORT;
         int taskNo = host.getSendingWindow().getNewTask();
-        byte[] data = new byte[0];
+        byte[] data = new byte[1];
+        data[0] = 0;
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);

@@ -144,7 +144,7 @@ public class ReceivingWindow implements Runnable {
         data[0] = 0;
         OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getTaskNo(), incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, packetLAF.get(incomingPacket.getTaskNo()));
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, incomingPacket.getSequenceNo(), packetLAF.get(incomingPacket.getTaskNo()));
-        new SendPacket(host, outgoingPacket).run();
+        new Thread(new SendPacket(host, outgoingPacket)).start();
     }
 
     // SENDLAF
@@ -153,7 +153,7 @@ public class ReceivingWindow implements Runnable {
         data[0] = 0;
         OutgoingData outgoingData = new OutgoingData(Protocol.ACK, taskNo, destinationIP, destinationPort, data, packetLAF.get(taskNo));
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, 0, packetLAF.get(taskNo));
-        new SendPacket(host, outgoingPacket).run();
+        new Thread(new SendPacket(host, outgoingPacket)).start();
     }
 
     private int getSequenceNo(int totalSequenceNo) {

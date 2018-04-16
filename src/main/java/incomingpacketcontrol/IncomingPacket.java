@@ -38,7 +38,6 @@ public class IncomingPacket {
         int checksumSource = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM+1));
         int checksumReceiver = CyclicRedundancyCheck.checksum(Arrays.copyOfRange(byteMessage, Protocol.LASTINDEX_CHECKSUM+1, byteMessage.length));
 
-        System.out.println("CRC_source: " + checksumSource + ", CRC_receiver: " + checksumReceiver);
         if (checksumSource == checksumReceiver) {
             isOK = true;
             dissectMessage(byteMessage);
@@ -56,23 +55,6 @@ public class IncomingPacket {
         this.packetSize = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATASIZE, Protocol.LASTINDEX_DATASIZE +1);
         this.checkSum = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM+1);
         this.data = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATA, byteMessage.length);
-    }
-
-    private byte[] getMessage(DatagramPacket datagramPacket) {
-        // Convert DatagramPacket into a byte array of the right length
-        int k = datagramPacket.getLength();
-        DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(datagramPacket.getData()));
-        byte[] byteMessage = new byte[k];
-
-        for (int i = 0; i < k; i++) {
-            try {
-                byteMessage[i] = dataInputStream.readByte();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return byteMessage;
     }
 
     public void setTotalSequenceNo(int totalSequenceNo) {
