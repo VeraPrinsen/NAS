@@ -3,6 +3,8 @@ package host;
 import general.Protocol;
 import incomingpacketcontrol.IncomingPacket;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
