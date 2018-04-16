@@ -46,7 +46,7 @@ public class Protocol {
     public static final String UPLOAD_APPROVED = "UA";
     public static final String UPLOAD_DENIED = "UD";
 
-    public static final String REQUEST_FILELIST = "AF";
+    public static final String REQUEST_FILELIST = "RF";
     public static final String FILELIST = "FL";
 
     public static final String SENDDATA = "SD";
@@ -84,6 +84,6 @@ public class Protocol {
             return null;
         }
     }
-    public static final String SAVEPATH_SERVER = "saves/";
-    public static final String SAVEPATH_CLIENT = "Users/vera.prinsen/Documents/Module2/Eindopdracht/saves/";
+    public static final String SAVEPATH_SERVER = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/serverSaves/";
+    public static final String SAVEPATH_CLIENT = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/clientSaves/";
 }

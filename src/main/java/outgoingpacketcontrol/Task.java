@@ -51,7 +51,7 @@ public class Task implements Runnable {
             byte[] packet = Arrays.copyOfRange(data.getData(), i*Protocol.maxDataSize, endIndex);
 
             String sequenceCmd;
-            if (nPackets == 1) {
+            if (nPackets == 1 && i == j) {
                 sequenceCmd = Protocol.SINGLE;
             } else if (j == 0) {
                 sequenceCmd = Protocol.FIRST;

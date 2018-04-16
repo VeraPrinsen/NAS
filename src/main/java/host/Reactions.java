@@ -4,12 +4,14 @@ import fileoperators.FileReaderClass;
 import fileoperators.FileWriterClass;
 import host.Host;
 import general.Protocol;
+import server.Server;
 import general.Utils;
 import outgoingpacketcontrol.OutgoingData;
 import outgoingpacketcontrol.Task;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -24,7 +26,7 @@ public class Reactions {
     }
 
     public static void sendDownloadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
-        String command = Protocol.UPLOAD_APPROVED;
+        String command = Protocol.DOWNLOAD_APPROVED;
         int taskNo = host.getSendingWindow().getNewTask();
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
@@ -35,7 +37,13 @@ public class Reactions {
         String dataSentence = new String(data);
         String[] args = dataSentence.split(Protocol.DELIMITER);
 
-        String fullFileName = host.getExpectedUploads(args[0]);
+        String fullFileName;
+        if (host instanceof Server) {
+            fullFileName = args[0];
+        } else {
+            fullFileName = host.getExpectedUploads(args[0]);
+        }
+
         byte[] dataBytes = FileReaderClass.fileToByteArray(fullFileName);
 
         String command = Protocol.SENDDATA;

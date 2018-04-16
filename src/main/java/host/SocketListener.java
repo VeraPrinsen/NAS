@@ -27,7 +27,6 @@ public class SocketListener implements Runnable {
                 e.printStackTrace();
             }
             int k = receivePacket.getLength();
-            System.out.println(k);
             byte[] messageBytes = receivePacket.getData();
             DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
 
@@ -58,6 +57,6 @@ public class SocketListener implements Runnable {
     }
 
     private void showInfo(IncomingPacket packet) {
-        System.out.println(packet.getSourceIP() + "/" + packet.getSourcePort() + " | " + packet.getCommand() +  "-" + packet.getTaskNo() + "-" + packet.getSequenceNo() + " received");
+        System.out.println(packet.getSourceIP() + "/" + packet.getSourcePort() + " | " + packet.getCommand() +  "-" + packet.getTaskNo() + "-" + packet.getSequenceNo() + "-" + packet.getTotalSequenceNo() + " received");
     }
 }

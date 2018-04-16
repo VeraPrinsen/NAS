@@ -14,6 +14,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 // TODO: Clean up
 // TODO: Receiving packets goes to quick for the LFR and LAF to keep up. Maybe some wait() and notify() ?
@@ -32,6 +34,8 @@ public class ReceivingWindow implements Runnable {
     private HashMap<Integer, Integer> packetTotalLAF;
     private HashMap<Integer, Integer> packetFirstReceived;
     private HashMap<Integer, Integer> packetLastReceived;
+
+    Lock lock = new ReentrantLock();
 
     public ReceivingWindow(Host host) {
         this.host = host;
@@ -86,6 +90,7 @@ public class ReceivingWindow implements Runnable {
                 sendLAF(taskNo, packetsReceived.get(taskNo).get(0).getSourceIP(), packetsReceived.get(taskNo).get(0).getSourcePort());
             }
 
+            System.out.println(taskNo + "-" + packetFirstReceived.get(taskNo) + "-" + packetLastReceived.get(taskNo));
             if (packetFirstReceived.get(taskNo) >= 0 && packetLastReceived.get(taskNo) >= 0) {
                 if (isFinished(taskNo)) {
                     // do something
@@ -120,9 +125,9 @@ public class ReceivingWindow implements Runnable {
             if (!taskExists(taskNo)) {
                 addTask(taskNo);
             }
+            incomingPacket.setTotalSequenceNo(totalSequenceNo);
             sendAck(incomingPacket);
 
-            incomingPacket.setTotalSequenceNo(totalSequenceNo);
             packetsReceived.get(taskNo).add(incomingPacket);
             sequenceReceived.get(taskNo).add(totalSequenceNo);
 
@@ -139,7 +144,7 @@ public class ReceivingWindow implements Runnable {
 
     // SENDACK
     private void sendAck(IncomingPacket incomingPacket) {
-        System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
+        System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
         byte[] data = new byte[1];
         data[0] = 0;
         OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getTaskNo(), incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, packetLAF.get(incomingPacket.getTaskNo()));
@@ -219,22 +224,26 @@ public class ReceivingWindow implements Runnable {
     }
 
     private void removeTask(int taskNo) {
-        pauseUpdates = true;
-
-        packetsReceived.remove(taskNo);
-        sequenceReceived.remove(taskNo);
-        packetCycleNo.remove(taskNo);
-        packetLFR.remove(taskNo);
-        packetLAF.remove(taskNo);
-        packetTotalLFR.remove(taskNo);
-        packetTotalLAF.remove(taskNo);
-        packetFirstReceived.remove(taskNo);
-        packetLastReceived.remove(taskNo);
-
-        pauseUpdates = false;
+//        lock.lock();
+//        pauseUpdates = true;
+//
+//        packetsReceived.remove(taskNo);
+//        sequenceReceived.remove(taskNo);
+//        packetCycleNo.remove(taskNo);
+//        packetLFR.remove(taskNo);
+//        packetLAF.remove(taskNo);
+//        packetTotalLFR.remove(taskNo);
+//        packetTotalLAF.remove(taskNo);
+//        packetFirstReceived.remove(taskNo);
+//        packetLastReceived.remove(taskNo);
+//
+//        pauseUpdates = false;
+//        lock.unlock();
     }
 
     private Set<Integer> getTasks() {
-        return sequenceReceived.keySet();
+        synchronized (sequenceReceived) {
+            return sequenceReceived.keySet();
+        }
     }
 }

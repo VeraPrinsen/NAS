@@ -29,15 +29,22 @@ public class DataAssembler implements Runnable {
         String command = packetList.get(0).getCommand();
         InetAddress sourceIP = packetList.get(0).getSourceIP();
         int sourcePort = packetList.get(0).getSourcePort();
+        System.out.println(command + " received");
         switch (command) {
             case Protocol.DOWNLOAD:
                 System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(getDataArray(dataArray)) + " received");
-//                Reactions.sendDownloadApproved(host, data, sourceIP, sourcePort);
+                Reactions.sendDownloadApproved(host, getDataArray(dataArray), sourceIP, sourcePort);
+                String fullFileNameDL = Protocol.SAVEPATH_SERVER + new String(getDataArray(dataArray));
+                Reactions.sendFile(host, fullFileNameDL.getBytes(), sourceIP, sourcePort);
                 break;
 
             case Protocol.UPLOAD:
                 System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD: " +  new String(getDataArray(dataArray)) + " received");
                 Reactions.sendUploadApproved(host, getDataArray(dataArray), sourceIP, sourcePort);
+                break;
+
+            case Protocol.DOWNLOAD_APPROVED:
+                // for now do nothing
                 break;
 
             case Protocol.UPLOAD_APPROVED:

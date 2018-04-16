@@ -13,10 +13,19 @@ import java.net.InetAddress;
 // TODO: Implement tasks Client input
 public class ClientCommands {
 
-    public static void download(Host host) {
+    public static void download(Client client) {
+        // OTHER IDEA:
         // ASK SERVER FOR FILELIST
         // CHOOSE FILE FROM LIST
         // RECEIVE PACKETS AND SAVE FILE
+
+        String fileName = client.readString("What file do you want to download?");
+        byte[] dataBytes = fileName.getBytes();
+        client.addExpectedDownloads(fileName);
+        int taskNo = client.getSendingWindow().getNewTask();
+        OutgoingData outgoingData = new OutgoingData(Protocol.DOWNLOAD, taskNo, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
+        client.getSendingWindow().addTask(taskNo);
+        new Thread(new Task(client, outgoingData)).start();
     }
 
     public static void upload(Client client) {
