@@ -1,4 +1,4 @@
-package server;
+package host;
 
 import fileoperators.FileReaderClass;
 import fileoperators.FileWriterClass;
@@ -10,6 +10,8 @@ import outgoingpacketcontrol.Task;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.Base64;
 
 public class Reactions {
 
@@ -51,7 +53,11 @@ public class Reactions {
         String message = new String(data);
         String[] args = message.split(Protocol.DELIMITER);
         String dataString = args[2];
-        byte[] dataBytes = dataString.getBytes();
+
+        int headerSize = args[0].length() + args[1].length() + 3*(Protocol.DELIMITER.getBytes().length);
+
+        byte[] dataBytes = Arrays.copyOfRange(data, headerSize + 1, data.length);
+        System.out.println(nBytes + "-" + dataBytes.length);
         FileWriterClass.byteArrayToFile(dataBytes, fileName);
         System.out.println(fileName + " saved");
     }

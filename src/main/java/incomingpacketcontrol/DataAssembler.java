@@ -3,7 +3,7 @@ package incomingpacketcontrol;
 import host.Host;
 import general.Protocol;
 import general.Utils;
-import server.Reactions;
+import host.Reactions;
 import client.Client;
 import java.net.InetAddress;
 import java.util.ArrayList;
