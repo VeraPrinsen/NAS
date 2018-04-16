@@ -26,8 +26,22 @@ public class SocketListener implements Runnable {
                 // when connection is closed?
                 e.printStackTrace();
             }
+            int k = receivePacket.getLength();
+            System.out.println(k);
+            byte[] messageBytes = receivePacket.getData();
+            DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(messageBytes));
 
-            IncomingPacket incomingPacket = new IncomingPacket(receivePacket);
+            byte[] receivedData = new byte[k];
+
+            for (int i = 0; i < k; i++) {
+                try {
+                    receivedData[i] = dataInputStream.readByte();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            IncomingPacket incomingPacket = new IncomingPacket(receivePacket.getAddress(), receivePacket.getPort(), receivedData);
             showInfo(incomingPacket);
             if (incomingPacket.isOK()) {
                 switch (incomingPacket.getCommand()) {

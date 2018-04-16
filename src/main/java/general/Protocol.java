@@ -64,7 +64,7 @@ public class Protocol {
     public static final String CONTINUE = "CN";
 
     // Other info
-    public static final int maxPacketSize = 1500;                                   // maximum size of packet in bytes (data and header)
+    public static final int maxPacketSize = 1500;                                     // maximum size of packet in bytes (data and header)
     public static final int maxDataSize = maxPacketSize - HEADERSIZE;               // maximum size of data in bytes (without header)
     public static final int maxTaskNo = (int) Math.pow(2, TASKSIZE*8);              // maximum task number (1 byte)
     public static final int maxSequenceNo = (int) Math.pow(2, SEQUENCESIZE*8);      // maximum sequence number (1 byte)

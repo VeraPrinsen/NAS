@@ -1,6 +1,8 @@
 package outgoingpacketcontrol;
 
+import fileoperators.FileReaderClass;
 import general.Protocol;
+import general.Utils;
 import host.Host;
 
 import java.util.Arrays;
@@ -27,12 +29,25 @@ public class Task implements Runnable {
             nPackets = (data.getData().length / Protocol.maxDataSize) + 1;
         }
 
+        if (data.isFile()) {
+            String packetString = data.getFullFileName() + Protocol.DELIMITER + data.getData().length;
+            OutgoingPacket firstOutgoingPacket = new OutgoingPacket(data, Protocol.FIRST, packetString.getBytes(), 0, data.getLAF());
+            new SendPacket(host, firstOutgoingPacket).run();
+
+            nPackets++;
+        }
+
         for (int i = 0; i < nPackets; i++) {
+            int j = i;
+            if (data.isFile()) {
+                j = j + 1;
+            }
+
             int endIndex;
-            if (i == nPackets - 1) {
+            if (j == nPackets - 1) {
                 endIndex = data.getData().length;
             } else {
-                endIndex = ((i+1)* Protocol.maxDataSize) + 1;
+                endIndex = ((i+1)* Protocol.maxDataSize);
             }
 
             byte[] packet = Arrays.copyOfRange(data.getData(), i*Protocol.maxDataSize, endIndex);
@@ -40,16 +55,16 @@ public class Task implements Runnable {
             String sequenceCmd;
             if (nPackets == 1) {
                 sequenceCmd = Protocol.SINGLE;
-            } else if (i == 0) {
+            } else if (j == 0) {
                 sequenceCmd = Protocol.FIRST;
-            } else if (i == nPackets - 1) {
+            } else if (j == nPackets - 1) {
                 sequenceCmd = Protocol.LAST;
             } else {
                 sequenceCmd = Protocol.CONTINUE;
             }
 
             // If host is not able to send because of sliding window, wait till the window opens again (keep updating)
-            while (!data.getCommand().equals(Protocol.ACK) && !host.getSendingWindow().canSend(data.getTaskNo(), i)) {
+            while (!data.getCommand().equals(Protocol.ACK) && !host.getSendingWindow().canSend(data.getTaskNo(), j)) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -57,7 +72,7 @@ public class Task implements Runnable {
                 }
             }
 
-            OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, i, data.getLAF());
+            OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, j, data.getLAF());
             new SendPacket(host, outgoingPacket).run();
             // new Thread(new SendPacket(host, outgoingPacket)).start();
         }

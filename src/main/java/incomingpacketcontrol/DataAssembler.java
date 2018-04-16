@@ -7,6 +7,7 @@ import host.Reactions;
 import client.Client;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 // TODO: What must be done after receiving all these data?
 public class DataAssembler implements Runnable {
@@ -25,30 +26,23 @@ public class DataAssembler implements Runnable {
             dataArray[packetList.get(i).getTotalSequenceNo()] = packetList.get(i).getData();
         }
 
-        byte[] data = dataArray[0];
-        if (dataArray.length > 1) {
-            for (int j = 1; j < dataArray.length; j++) {
-                data = Utils.concat2byte(data, dataArray[j]);
-            }
-        }
-
         String command = packetList.get(0).getCommand();
         InetAddress sourceIP = packetList.get(0).getSourceIP();
         int sourcePort = packetList.get(0).getSourcePort();
         switch (command) {
             case Protocol.DOWNLOAD:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(data) + " received");
+                System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(getDataArray(dataArray)) + " received");
 //                Reactions.sendDownloadApproved(host, data, sourceIP, sourcePort);
                 break;
 
             case Protocol.UPLOAD:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD: " +  new String(data) + " received");
-                Reactions.sendUploadApproved(host, data, sourceIP, sourcePort);
+                System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD: " +  new String(getDataArray(dataArray)) + " received");
+                Reactions.sendUploadApproved(host, getDataArray(dataArray), sourceIP, sourcePort);
                 break;
 
             case Protocol.UPLOAD_APPROVED:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD_APPROVED: " +  new String(data) + " received");
-                Reactions.sendFile(host, data, sourceIP, sourcePort);
+                System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD_APPROVED: " +  new String(getDataArray(dataArray)) + " received");
+                Reactions.sendFile(host, getDataArray(dataArray), sourceIP, sourcePort);
                 break;
 
             case Protocol.REQUEST_FILELIST:
@@ -58,7 +52,7 @@ public class DataAssembler implements Runnable {
 
             case Protocol.FILELIST:
                 System.out.println(sourceIP.toString() + "/" + sourcePort + " | FILELIST received");
-                Reactions.showFileList(data);
+                Reactions.showFileList(getDataArray(dataArray));
                 break;
 
             case Protocol.SENDDATA:
@@ -77,11 +71,24 @@ public class DataAssembler implements Runnable {
                 int nBytes = Integer.parseInt(args[1]);
 
                 System.out.println(sourceIP.toString() + "/" + sourcePort + " | SENDDATA: " + fileName + " " + nBytes + " bytes received");
-                Reactions.saveFile(pathName + fileName, nBytes, data);
+                byte[][] dataArray2 = Arrays.copyOfRange(dataArray, 1, dataArray.length);
+
+                Reactions.saveFile(pathName + fileName, nBytes, getDataArray(dataArray2));
                 break;
 
             default:
                 break;
         }
+    }
+
+    public byte[] getDataArray(byte[][] dataPackets) {
+        byte[] data = dataPackets[0];
+        if (dataPackets.length > 1) {
+            for (int j = 1; j < dataPackets.length; j++) {
+                data = Utils.concat2byte(data, dataPackets[j]);
+            }
+        }
+
+        return data;
     }
 }

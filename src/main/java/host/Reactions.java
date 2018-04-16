@@ -38,27 +38,16 @@ public class Reactions {
         String fullFileName = host.getExpectedUploads(args[0]);
         byte[] dataBytes = FileReaderClass.fileToByteArray(fullFileName);
 
-        String newDataSentence = dataSentence + Protocol.DELIMITER;
-        dataBytes = Utils.concat2byte(newDataSentence.getBytes(), dataBytes);
-
         String command = Protocol.SENDDATA;
         int taskNo = host.getSendingWindow().getNewTask();
 
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, dataBytes, Protocol.WS);
+        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, fullFileName, dataBytes, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
         new Thread(new Task(host, outgoingData)).start();
     }
 
     public static void saveFile(String fileName, int nBytes, byte[] data) {
-        String message = new String(data);
-        String[] args = message.split(Protocol.DELIMITER);
-        String dataString = args[2];
-
-        int headerSize = args[0].length() + args[1].length() + 3*(Protocol.DELIMITER.getBytes().length);
-
-        byte[] dataBytes = Arrays.copyOfRange(data, headerSize + 1, data.length);
-        System.out.println(nBytes + "-" + dataBytes.length);
-        FileWriterClass.byteArrayToFile(dataBytes, fileName);
+        FileWriterClass.byteArrayToFile(data, fileName);
         System.out.println(fileName + " saved");
     }
 

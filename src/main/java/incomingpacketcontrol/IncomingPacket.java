@@ -27,31 +27,27 @@ public class IncomingPacket {
     private byte[] data;
     private boolean isOK;
 
-    public IncomingPacket(DatagramPacket receivedPacket) {
-        checkMessage(receivedPacket);
+    public IncomingPacket(InetAddress sourceIP, int sourcePort, byte[] byteMessage) {
+        this.sourceIP = sourceIP;
+        this.sourcePort = sourcePort;
+
+        checkMessage(byteMessage);
     }
 
-    private void checkMessage(DatagramPacket receivedPacket) {
-        byte[] byteMessage = getMessage(receivedPacket);
-
+    private void checkMessage(byte[] byteMessage) {
         int checksumSource = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM+1));
         int checksumReceiver = CyclicRedundancyCheck.checksum(Arrays.copyOfRange(byteMessage, Protocol.LASTINDEX_CHECKSUM+1, byteMessage.length));
 
         System.out.println("CRC_source: " + checksumSource + ", CRC_receiver: " + checksumReceiver);
         if (checksumSource == checksumReceiver) {
             isOK = true;
-            dissectMessage(receivedPacket);
+            dissectMessage(byteMessage);
         } else {
             isOK = false;
         }
     }
 
-    private void dissectMessage(DatagramPacket receivedPacket) {
-        this.sourceIP = receivedPacket.getAddress();
-        this.sourcePort = receivedPacket.getPort();
-
-        byte[] byteMessage = getMessage(receivedPacket);
-
+    private void dissectMessage(byte[] byteMessage) {
         this.command = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_COMMAND, Protocol.LASTINDEX_COMMAND+1));
         this.sequenceCmd = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCECMD, Protocol.LASTINDEX_SEQUENCECMD+1));
         this.LAF = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_LAF, Protocol.LASTINDEX_LAF+1));
