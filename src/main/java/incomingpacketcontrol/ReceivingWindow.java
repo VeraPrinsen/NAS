@@ -1,15 +1,12 @@
 package incomingpacketcontrol;
 
-import checksum.CyclicRedundancyCheck;
 import general.Protocol;
-import general.Utils;
+import gui.InfoGUI;
 import host.Host;
 import outgoingpacketcontrol.OutgoingData;
 import outgoingpacketcontrol.OutgoingPacket;
 import outgoingpacketcontrol.SendPacket;
-import outgoingpacketcontrol.Task;
 
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +33,7 @@ public class ReceivingWindow implements Runnable {
     private HashMap<Integer, Integer> packetLastReceived;
     private HashMap<Integer, Boolean> taskDone;
     private HashMap<Integer, Long> taskDoneTime;
+    private HashMap<Integer, InfoGUI> infoGUI;
 
     Lock lock = new ReentrantLock();
 
@@ -53,6 +51,7 @@ public class ReceivingWindow implements Runnable {
         packetLastReceived = new HashMap<>();
         taskDone = new HashMap<>();
         taskDoneTime = new HashMap<>();
+        infoGUI = new HashMap<>();
     }
 
     public void run() {
@@ -106,7 +105,7 @@ public class ReceivingWindow implements Runnable {
 //                        e.printStackTrace();
 //                    }
                 } else if (taskDone.get(taskNo) && taskDoneTime.get(taskNo) + Protocol.TIMEBEFOREREMOVE < System.currentTimeMillis()) {
-                    //System.out.println("Task " + taskNo + " removed");
+                    //System.out.println("SendingTask " + taskNo + " removed");
                     //removeTask(taskNo);
                 }
             }
@@ -153,12 +152,12 @@ public class ReceivingWindow implements Runnable {
 
     // SENDACK
     private void sendAck(IncomingPacket incomingPacket) {
-        System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
+        // System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
         byte[] data = new byte[1];
         data[0] = 0;
         OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getTaskNo(), incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, packetLAF.get(incomingPacket.getTaskNo()));
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, incomingPacket.getSequenceNo(), packetLAF.get(incomingPacket.getTaskNo()));
-        new Thread(new SendPacket(host, outgoingPacket)).start();
+        new Thread(new SendPacket(host, null, outgoingPacket)).start();
     }
 
     // SENDLAF
@@ -167,7 +166,7 @@ public class ReceivingWindow implements Runnable {
         data[0] = 0;
         OutgoingData outgoingData = new OutgoingData(Protocol.ACK, taskNo, destinationIP, destinationPort, data, packetLAF.get(taskNo));
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, 0, packetLAF.get(taskNo));
-        new Thread(new SendPacket(host, outgoingPacket)).start();
+        new Thread(new SendPacket(host, null, outgoingPacket)).start();
     }
 
     private int getSequenceNo(int totalSequenceNo) {

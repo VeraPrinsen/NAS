@@ -1,6 +1,7 @@
 package outgoingpacketcontrol;
 
 import checksum.CyclicRedundancyCheck;
+import client.Client;
 import host.Host;
 import general.Protocol;
 import general.Utils;
@@ -10,11 +11,13 @@ import java.net.DatagramPacket;
 public class SendPacket implements Runnable {
 
     private Host host;
+    private SendingTask sendingTask;
     private OutgoingPacket packet;
 
     // TODO: Doc
-    public SendPacket(Host host, OutgoingPacket outgoingPacket) {
+    public SendPacket(Host host, SendingTask sendingTask, OutgoingPacket outgoingPacket) {
         this.host = host;
+        this.sendingTask = sendingTask;
         this.packet = outgoingPacket;
     }
 
@@ -59,7 +62,7 @@ public class SendPacket implements Runnable {
         }
         while (!ackReceived) {
             host.send(datagramPacket);
-            System.out.println("Send: " + packet.getCommand() + "-" + packet.getTaskNo() + "-" + packet.getSequenceNo());
+            // System.out.println("Send: " + packet.getCommand() + "-" + packet.getTaskNo() + "-" + packet.getSequenceNo());
             nTransmissions++;
 
             if (packet.getCommand().equals(Protocol.ACK)) {
@@ -69,7 +72,7 @@ public class SendPacket implements Runnable {
             long startTime = System.currentTimeMillis();
             long endTime = startTime + Protocol.TIMEOUT;
 
-            while (!ackReceived && System.currentTimeMillis() < endTime) {
+            while ((sendingTask != null && sendingTask.isPaused()) || (!ackReceived && System.currentTimeMillis() < endTime)) {
                 if (host.getSendingWindow().hasAck(packet.getTaskNo(), packet.getTotalSequenceNo())) {
                     ackReceived = true;
                 }
@@ -82,6 +85,9 @@ public class SendPacket implements Runnable {
             }
         }
 
+        if (host instanceof Client && packet.getCommand().equals(Protocol.SENDDATA)) {
+            sendingTask.setPacketSend();
+        }
         return nTransmissions;
     }
 }

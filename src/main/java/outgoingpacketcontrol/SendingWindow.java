@@ -53,7 +53,7 @@ public class SendingWindow {
             ackLFS.replace(taskNo, sequenceNo);
             ackTotalLFS.replace(taskNo, totalSequenceNo);
         } else {
-            System.out.println("confirmPacketSend(taskNo, sequenceNo, totalSequenceNo): taskNo " + taskNo + " not known");
+            // System.out.println("confirmPacketSend(taskNo, sequenceNo, totalSequenceNo): taskNo " + taskNo + " not known");
         }
     }
 
@@ -80,10 +80,10 @@ public class SendingWindow {
                 receivedAcks.get(taskNo).add(receivedAck);
                 update(taskNo);
             } else {
-                System.out.println("processReceivedAck(ack): ack with sequenceNo " + sequenceNo + " was not expected");
+                // System.out.println("processReceivedAck(ack): ack with sequenceNo " + sequenceNo + " was not expected");
             }
         } else {
-            System.out.println("processReceivedAck(ack): taskNo not known, ack was not expected");
+            // System.out.println("processReceivedAck(ack): taskNo not known, ack was not expected");
         }
     }
 

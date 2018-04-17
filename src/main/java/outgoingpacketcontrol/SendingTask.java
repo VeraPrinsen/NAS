@@ -1,20 +1,33 @@
 package outgoingpacketcontrol;
 
-import fileoperators.FileReaderClass;
+import client.Client;
 import general.Protocol;
-import general.Utils;
+import gui.InfoGUI;
 import host.Host;
 
 import java.util.Arrays;
 
-public class Task implements Runnable {
+public class SendingTask implements Runnable {
 
     private Host host;
     private OutgoingData data;
 
-    public Task(Host host, OutgoingData outgoingData) {
+    private InfoGUI infoGUI;
+    private int nPackets;
+    private int packetsSend;
+    private boolean isPaused;
+
+    public SendingTask(Host host, OutgoingData outgoingData) {
         this.host = host;
         this.data = outgoingData;
+        isPaused = false;
+        if (host instanceof Client && data.getCommand().equals(Protocol.SENDDATA)) {
+            infoGUI = new InfoGUI(this);
+            String fullFileName = data.getFullFileName();
+            String[] args = fullFileName.split("/");
+            infoGUI.setTitleLabel("Upload " + args[args.length-1]);
+        }
+        packetsSend = 0;
     }
 
     public void run() {
@@ -22,7 +35,6 @@ public class Task implements Runnable {
     }
 
     private void sendPackets() {
-        int nPackets;
         if ((data.getData().length % Protocol.maxDataSize) == 0) {
             nPackets = (data.getData().length / Protocol.maxDataSize);
         } else {
@@ -32,7 +44,7 @@ public class Task implements Runnable {
         if (data.isFile()) {
             String packetString = data.getFullFileName() + Protocol.DELIMITER + data.getData().length;
             OutgoingPacket firstOutgoingPacket = new OutgoingPacket(data, Protocol.FIRST, packetString.getBytes(), 0, data.getLAF());
-            new Thread(new SendPacket(host, firstOutgoingPacket)).start();
+            new Thread(new SendPacket(host, this, firstOutgoingPacket)).start();
         }
 
         for (int i = 0; i < nPackets; i++) {
@@ -62,7 +74,7 @@ public class Task implements Runnable {
             }
 
             // If host is not able to send because of sliding window, wait till the window opens again (keep updating)
-            while (!data.getCommand().equals(Protocol.ACK) && !host.getSendingWindow().canSend(data.getTaskNo(), j)) {
+            while (isPaused || (!data.getCommand().equals(Protocol.ACK) && !host.getSendingWindow().canSend(data.getTaskNo(), j))) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -71,7 +83,24 @@ public class Task implements Runnable {
             }
 
             OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, j, data.getLAF());
-            new Thread(new SendPacket(host, outgoingPacket)).start();
+            new Thread(new SendPacket(host, this, outgoingPacket)).start();
+        }
+    }
+
+    public void setPaused(boolean isPaused) {
+        this.isPaused = isPaused;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public synchronized void setPacketSend() {
+        packetsSend++;
+        if (packetsSend == nPackets+1) {
+            infoGUI.setProgressLable("Server is saving the file...");
+        } else {
+            infoGUI.setProgressLable(packetsSend + " of " + (nPackets + 1) + " send");
         }
     }
 }

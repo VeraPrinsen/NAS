@@ -5,7 +5,7 @@ import fileoperators.FileChooserClass;
 import host.Host;
 import general.Protocol;
 import outgoingpacketcontrol.OutgoingData;
-import outgoingpacketcontrol.Task;
+import outgoingpacketcontrol.SendingTask;
 
 import java.io.File;
 import java.net.InetAddress;
@@ -25,7 +25,7 @@ public class ClientCommands {
         int taskNo = client.getSendingWindow().getNewTask();
         OutgoingData outgoingData = new OutgoingData(Protocol.DOWNLOAD, taskNo, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
         client.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(client, outgoingData)).start();
+        new Thread(new SendingTask(client, outgoingData)).start();
     }
 
     public static void upload(Client client) {
@@ -55,7 +55,7 @@ public class ClientCommands {
 
         OutgoingData outgoingData = new OutgoingData(Protocol.UPLOAD, taskNo, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
         client.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(client, outgoingData)).start();
+        new Thread(new SendingTask(client, outgoingData)).start();
     }
 
     public static void fileList(Host host) {
@@ -71,7 +71,7 @@ public class ClientCommands {
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
+        new Thread(new SendingTask(host, outgoingData)).start();
     }
 
     public static void testSmallData(Host host) {
@@ -83,7 +83,7 @@ public class ClientCommands {
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
+        new Thread(new SendingTask(host, outgoingData)).start();
     }
 
     public static void testLargeData(Host host) {
@@ -98,7 +98,7 @@ public class ClientCommands {
         byte[] data = sentence.getBytes();
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
+        new Thread(new SendingTask(host, outgoingData)).start();
     }
 
     public static void textExtraLargeData(Host host) {
@@ -130,7 +130,7 @@ public class ClientCommands {
         byte[] data = sentence.getBytes();
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
+        new Thread(new SendingTask(host, outgoingData)).start();
     }
 
     public static void testFileData(Host host) {
@@ -150,7 +150,7 @@ public class ClientCommands {
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
         host.getSendingWindow().addTask(taskNo);
-        new Thread(new Task(host, outgoingData)).start();
+        new Thread(new SendingTask(host, outgoingData)).start();
     }
 
 }

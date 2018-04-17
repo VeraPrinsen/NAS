@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 
 public class Protocol {
 
+    public static final boolean onPi = true;
+
     // HEADER INFO
     public static final int FIRSTINDEX_CHECKSUM = 0;
     public static final int LASTINDEX_CHECKSUM = 3;
@@ -27,14 +29,14 @@ public class Protocol {
     public static final int TASKSIZE = LASTINDEX_TASK - FIRSTINDEX_TASK + 1;
 
     public static final int FIRSTINDEX_SEQUENCE = 11;
-    public static final int LASTINDEX_SEQUENCE = 12;
+    public static final int LASTINDEX_SEQUENCE = 11;
     public static final int SEQUENCESIZE = LASTINDEX_SEQUENCE - FIRSTINDEX_SEQUENCE + 1;
 
-    public static final int FIRSTINDEX_LAF = 13;
-    public static final int LASTINDEX_LAF = 14;
+    public static final int FIRSTINDEX_LAF = 12;
+    public static final int LASTINDEX_LAF = 12;
     public static final int LAFSIZE = LASTINDEX_LAF - FIRSTINDEX_LAF + 1;
 
-    public static final int FIRSTINDEX_DATA = 15;
+    public static final int FIRSTINDEX_DATA = 13;
     public static final int HEADERSIZE = CHECKSUMSIZE + COMMANDSIZE + SEQUENCECMDSIZE + LAFSIZE + TASKSIZE + SEQUENCESIZE + DATASIZESIZE;
 
     // COMMANDS (2 bytes)
@@ -78,15 +80,23 @@ public class Protocol {
     // Let pi multicasten met z'n ip en port
     public static InetAddress getDefaultIp() {
         try {
-            return InetAddress.getByName("192.168.1.1");
-            //return InetAddress.getByName("localhost");
+            if (onPi) {
+                return InetAddress.getByName("192.168.1.1");
+            } else {
+                return InetAddress.getByName("localhost");
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    //public static final String SAVEPATH_SERVER = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/serverSaves/";
-    public static final String SAVEPATH_SERVER = "/home/pi/saves/";
+    public static String getSavePathServer() {
+        if (onPi) {
+            return "/home/pi/saves/";
+        } else {
+            return "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/serverSaves/";
+        }
+    }
     public static final String SAVEPATH_CLIENT = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/clientSaves/";
 }

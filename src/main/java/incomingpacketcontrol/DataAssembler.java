@@ -29,17 +29,17 @@ public class DataAssembler implements Runnable {
         String command = packetList.get(0).getCommand();
         InetAddress sourceIP = packetList.get(0).getSourceIP();
         int sourcePort = packetList.get(0).getSourcePort();
-        System.out.println(command + " received");
+        // System.out.println(command + " received");
         switch (command) {
             case Protocol.DOWNLOAD:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(getDataArray(dataArray)) + " received");
+                // System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(getDataArray(dataArray)) + " received");
                 Reactions.sendDownloadApproved(host, getDataArray(dataArray), sourceIP, sourcePort);
-                String fullFileNameDL = Protocol.SAVEPATH_SERVER + new String(getDataArray(dataArray));
+                String fullFileNameDL = Protocol.getSavePathServer() + new String(getDataArray(dataArray));
                 Reactions.sendFile(host, fullFileNameDL.getBytes(), sourceIP, sourcePort);
                 break;
 
             case Protocol.UPLOAD:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD: " +  new String(getDataArray(dataArray)) + " received");
+                // System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD: " +  new String(getDataArray(dataArray)) + " received");
                 Reactions.sendUploadApproved(host, getDataArray(dataArray), sourceIP, sourcePort);
                 break;
 
@@ -48,17 +48,17 @@ public class DataAssembler implements Runnable {
                 break;
 
             case Protocol.UPLOAD_APPROVED:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD_APPROVED: " +  new String(getDataArray(dataArray)) + " received");
+                // System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD_APPROVED: " +  new String(getDataArray(dataArray)) + " received");
                 Reactions.sendFile(host, getDataArray(dataArray), sourceIP, sourcePort);
                 break;
 
             case Protocol.REQUEST_FILELIST:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | REQUEST_FILELIST received");
+                // System.out.println(sourceIP.toString() + "/" + sourcePort + " | REQUEST_FILELIST received");
                 Reactions.sendFileList(host, sourceIP, sourcePort);
                 break;
 
             case Protocol.FILELIST:
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | FILELIST received");
+                // System.out.println(sourceIP.toString() + "/" + sourcePort + " | FILELIST received");
                 Reactions.showFileList(getDataArray(dataArray));
                 break;
 
@@ -67,7 +67,7 @@ public class DataAssembler implements Runnable {
                 if (host instanceof Client) {
                     pathName = Protocol.SAVEPATH_CLIENT;
                 } else {
-                    pathName = Protocol.SAVEPATH_SERVER;
+                    pathName = Protocol.getSavePathServer();
                 }
 
                 String message = new String(packetList.get(0).getData());
@@ -77,10 +77,10 @@ public class DataAssembler implements Runnable {
                 String fileName = fileNameArgs[fileNameArgs.length - 1];
                 int nBytes = Integer.parseInt(args[1]);
 
-                System.out.println(sourceIP.toString() + "/" + sourcePort + " | SENDDATA: " + fileName + " " + nBytes + " bytes received");
+                // System.out.println(sourceIP.toString() + "/" + sourcePort + " | SENDDATA: " + fileName + " " + nBytes + " bytes received");
                 byte[][] dataArray2 = Arrays.copyOfRange(dataArray, 1, dataArray.length);
 
-                Reactions.saveFile(pathName + fileName, nBytes, getDataArray(dataArray2));
+                Reactions.saveFile(pathName + fileName, nBytes, dataArray2);
                 break;
 
             default:

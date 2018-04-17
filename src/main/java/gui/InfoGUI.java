@@ -1,11 +1,15 @@
 package gui;
 
+import outgoingpacketcontrol.SendingTask;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class InfoGUI extends JFrame implements ChangeListener {
+
+    private SendingTask sendingTask;
 
     private JPanel titlePanel;
     private JToggleButton toggleButton;
@@ -14,8 +18,8 @@ public class InfoGUI extends JFrame implements ChangeListener {
     private JLabel barLable;
     private JLabel progressLable;
 
-    public InfoGUI() {
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public InfoGUI(SendingTask sendingTask) {
+        this.sendingTask = sendingTask;
 
         addComponents(this.getContentPane());
 
@@ -49,10 +53,6 @@ public class InfoGUI extends JFrame implements ChangeListener {
         pane.add(Box.createVerticalGlue());
     }
 
-    public static void main(String[] args) {
-        new InfoGUI();
-    }
-
     @Override
     public void stateChanged(ChangeEvent e) {
         if (toggleButton.isSelected()) {
@@ -63,18 +63,20 @@ public class InfoGUI extends JFrame implements ChangeListener {
     }
 
     private void pause() {
+        sendingTask.setPaused(true);
         toggleButton.setText("Resume");
     }
 
     private void resume() {
+        sendingTask.setPaused(false);
         toggleButton.setText("Pause");
     }
 
-    private void setTitleLabel(String message) {
+    public void setTitleLabel(String message) {
         titleLable.setText(message);
     }
 
-    private void setProgressLable(String message) {
+    public void setProgressLable(String message) {
         progressLable.setText(message);
     }
 
