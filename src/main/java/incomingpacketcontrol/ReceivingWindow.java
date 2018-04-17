@@ -34,6 +34,8 @@ public class ReceivingWindow implements Runnable {
     private HashMap<Integer, Integer> packetTotalLAF;
     private HashMap<Integer, Integer> packetFirstReceived;
     private HashMap<Integer, Integer> packetLastReceived;
+    private HashMap<Integer, Boolean> taskDone;
+    private HashMap<Integer, Long> taskDoneTime;
 
     Lock lock = new ReentrantLock();
 
@@ -49,6 +51,8 @@ public class ReceivingWindow implements Runnable {
         packetTotalLAF = new HashMap<>();
         packetFirstReceived = new HashMap<>();
         packetLastReceived = new HashMap<>();
+        taskDone = new HashMap<>();
+        taskDoneTime = new HashMap<>();
     }
 
     public void run() {
@@ -90,17 +94,20 @@ public class ReceivingWindow implements Runnable {
                 sendLAF(taskNo, packetsReceived.get(taskNo).get(0).getSourceIP(), packetsReceived.get(taskNo).get(0).getSourcePort());
             }
 
-            System.out.println(taskNo + "-" + packetFirstReceived.get(taskNo) + "-" + packetLastReceived.get(taskNo));
             if (packetFirstReceived.get(taskNo) >= 0 && packetLastReceived.get(taskNo) >= 0) {
                 if (isFinished(taskNo)) {
                     // do something
                     new Thread(new DataAssembler(host, packetsReceived.get(taskNo))).start();
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    removeTask(taskNo);
+                    taskDone.replace(taskNo, true);
+                    taskDoneTime.replace(taskNo, System.currentTimeMillis());
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+                } else if (taskDone.get(taskNo) && taskDoneTime.get(taskNo) + Protocol.TIMEBEFOREREMOVE < System.currentTimeMillis()) {
+                    //System.out.println("Task " + taskNo + " removed");
+                    //removeTask(taskNo);
                 }
             }
         }
@@ -139,6 +146,8 @@ public class ReceivingWindow implements Runnable {
             } else if (incomingPacket.getSequenceCmd().equals(Protocol.LAST)) {
                 packetLastReceived.replace(taskNo, totalSequenceNo);
             }
+        } else {
+            sendAck(incomingPacket);
         }
     }
 
@@ -204,7 +213,7 @@ public class ReceivingWindow implements Runnable {
                 return false;
             }
         }
-        return true;
+        return !taskDone.get(taskNo);
     }
 
     private boolean taskExists(int taskNo) {
@@ -221,29 +230,29 @@ public class ReceivingWindow implements Runnable {
         packetTotalLAF.put(taskNo, Protocol.WS - 1);
         packetFirstReceived.put(taskNo, -1);
         packetLastReceived.put(taskNo, -1);
+        taskDone.put(taskNo, false);
+        taskDoneTime.put(taskNo, new Long(0));
     }
 
     private void removeTask(int taskNo) {
-//        lock.lock();
-//        pauseUpdates = true;
-//
-//        packetsReceived.remove(taskNo);
-//        sequenceReceived.remove(taskNo);
-//        packetCycleNo.remove(taskNo);
-//        packetLFR.remove(taskNo);
-//        packetLAF.remove(taskNo);
-//        packetTotalLFR.remove(taskNo);
-//        packetTotalLAF.remove(taskNo);
-//        packetFirstReceived.remove(taskNo);
-//        packetLastReceived.remove(taskNo);
-//
-//        pauseUpdates = false;
-//        lock.unlock();
+        pauseUpdates = true;
+
+        packetsReceived.remove(taskNo);
+        sequenceReceived.remove(taskNo);
+        packetCycleNo.remove(taskNo);
+        packetLFR.remove(taskNo);
+        packetLAF.remove(taskNo);
+        packetTotalLFR.remove(taskNo);
+        packetTotalLAF.remove(taskNo);
+        packetFirstReceived.remove(taskNo);
+        packetLastReceived.remove(taskNo);
+        taskDone.remove(taskNo);
+        taskDoneTime.remove(taskNo);
+
+        pauseUpdates = false;
     }
 
-    private Set<Integer> getTasks() {
-        synchronized (sequenceReceived) {
-            return sequenceReceived.keySet();
-        }
+    private synchronized Set<Integer> getTasks() {
+        return sequenceReceived.keySet();
     }
 }

@@ -68,7 +68,8 @@ public class Protocol {
     public static final int maxDataSize = maxPacketSize - HEADERSIZE;               // maximum size of data in bytes (without header)
     public static final int maxTaskNo = (int) Math.pow(2, TASKSIZE*8);              // maximum task number (1 byte)
     public static final int maxSequenceNo = (int) Math.pow(2, SEQUENCESIZE*8);      // maximum sequence number (1 byte)
-    public static final int TIMEOUT = 3000;                                         // Timeout for Acknowledgement (in ms)
+    public static final int TIMEOUT = 3000;// Timeout for Acknowledgement (in ms)
+    public static final int TIMEBEFOREREMOVE = 20000;
     public static final int WS = maxSequenceNo / 4;                                 // Send Window Size (# packets)
 
     public static final String DELIMITER = "@@@";
@@ -77,13 +78,15 @@ public class Protocol {
     // Let pi multicasten met z'n ip en port
     public static InetAddress getDefaultIp() {
         try {
-            //return InetAddress.getByName("192.168.1.1");
-            return InetAddress.getByName("localhost");
+            return InetAddress.getByName("192.168.1.1");
+            //return InetAddress.getByName("localhost");
         } catch (UnknownHostException e) {
             e.printStackTrace();
             return null;
         }
     }
-    public static final String SAVEPATH_SERVER = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/serverSaves/";
+
+    //public static final String SAVEPATH_SERVER = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/serverSaves/";
+    public static final String SAVEPATH_SERVER = "/home/pi/saves/";
     public static final String SAVEPATH_CLIENT = "/Users/vera.prinsen/Documents/Module2/Eindopdracht/num2/clientSaves/";
 }

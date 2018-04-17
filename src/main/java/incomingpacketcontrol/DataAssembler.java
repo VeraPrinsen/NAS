@@ -92,7 +92,9 @@ public class DataAssembler implements Runnable {
         byte[] data = dataPackets[0];
         if (dataPackets.length > 1) {
             for (int j = 1; j < dataPackets.length; j++) {
-                data = Utils.concat2byte(data, dataPackets[j]);
+                if (dataPackets[j] != null) {
+                    data = Utils.concat2byte(data, dataPackets[j]);
+                }
             }
         }
 
