@@ -1,6 +1,8 @@
 package incomingpacketcontrol;
 
+import client.Client;
 import general.Protocol;
+import gui.InfoGUI;
 import host.Host;
 import host.Task;
 import outgoingpacketcontrol.OutgoingData;
@@ -12,8 +14,13 @@ import java.util.ArrayList;
 
 public class ReceivingTask extends Task {
 
-    private Host host;
+    private InfoGUI infoGUI;
     private ArrayList<IncomingPacket> receivedPackets;
+
+    private String command;
+    private int taskNo;
+    private InetAddress sourceIP;
+    private int sourcePort;
 
     private ArrayList<Integer> receivedSequenceNo;
     private int cycleNo;
@@ -24,13 +31,20 @@ public class ReceivingTask extends Task {
     private int firstSeq;
     private int lastSeq;
 
+    private int nPackets;
+
     private boolean taskDone;
     private long taskDoneTime;
 
-    public ReceivingTask(Host host) {
-        this.host = host;
+    public ReceivingTask(Host host, IncomingPacket incomingPacket) {
+        super(host);
         this.receivedPackets = new ArrayList<>();
         this.receivedSequenceNo = new ArrayList<>();
+
+        this.command = incomingPacket.getCommand();
+        this.taskNo = incomingPacket.getTaskNo();
+        this.sourceIP = incomingPacket.getSourceIP();
+        this.sourcePort = incomingPacket.getSourcePort();
 
         this.cycleNo = 0;
         this.LFR = -1;
@@ -40,8 +54,32 @@ public class ReceivingTask extends Task {
         this.firstSeq = -1;
         this.lastSeq = -1;
 
+        this.nPackets = 0;
+
         this.taskDone = false;
         this.taskDoneTime = 0;
+
+        if (host instanceof Client && incomingPacket.getCommand().equals(Protocol.SENDDATA)) {
+            infoGUI = new InfoGUI(this);
+        }
+    }
+
+    @Override
+    public void pause() {
+        byte[] data = new byte[1];
+        data[0] = 0;
+        OutgoingData outgoingData = new OutgoingData(Protocol.PAUSE, this.sourceIP, this.sourcePort, data, this.LAF);
+        OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, taskNo, Protocol.SINGLE, data, 0, this.LAF);
+        new Thread(new SendPacket(getHost(), null, outgoingPacket)).start();
+    }
+
+    @Override
+    public void resume() {
+        byte[] data = new byte[1];
+        data[0] = 0;
+        OutgoingData outgoingData = new OutgoingData(Protocol.RESUME, this.sourceIP, this.sourcePort, data, this.LAF);
+        OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, taskNo, Protocol.SINGLE, data, 0, this.LAF);
+        new Thread(new SendPacket(getHost(), null, outgoingPacket)).start();
     }
 
     @Override
@@ -73,6 +111,13 @@ public class ReceivingTask extends Task {
             if (LFR == 0 && receivedSequenceNo.size() > Protocol.maxSequenceNo) {
                 cycleNo++;
             }
+
+            System.out.println("nPackets: " + nPackets);
+            if (nPackets != 0) {
+                if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
+                    infoGUI.setProgressLable(receivedSequenceNo.size() + " of " + nPackets + " received");
+                }
+            }
         }
 
         if (LAFchanged) {
@@ -81,7 +126,10 @@ public class ReceivingTask extends Task {
 
         if (firstSeq >= 0 && lastSeq >= 0) {
             if (isFinished()) {
-                new Thread(new DataAssembler(host, receivedPackets)).start();
+                new Thread(new DataAssembler(getHost(), receivedPackets)).start();
+                if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
+                    infoGUI.setProgressLable("File is begin saved...");
+                }
                 taskDone = true;
                 taskDoneTime = System.currentTimeMillis();
             }
@@ -101,7 +149,7 @@ public class ReceivingTask extends Task {
         data[0] = 0;
         OutgoingData outgoingData = new OutgoingData(Protocol.ACK, destinationIP, destinationPort, data, LAF);
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, taskNo, Protocol.SINGLE, data, 0, LAF);
-        new Thread(new SendPacket(host, null, outgoingPacket)).start();
+        new Thread(new SendPacket(getHost(), null, outgoingPacket)).start();
     }
 
     private boolean isFinished() {
@@ -121,6 +169,18 @@ public class ReceivingTask extends Task {
     public void addReceivedPackets(IncomingPacket incomingPacket) {
         receivedPackets.add(incomingPacket);
         receivedSequenceNo.add(incomingPacket.getTotalSequenceNo());
+    }
+
+    public void guiFirst(String fileName, int nBytes) {
+        if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
+            infoGUI.setTitleLabel("Download: " + fileName);
+        }
+
+        if ((nBytes % Protocol.maxDataSize) == 0) {
+            this.nPackets = (nBytes / Protocol.maxDataSize) + 1;
+        } else {
+            this.nPackets = (nBytes / Protocol.maxDataSize) + 2;
+        }
     }
 
     public int getCycleNo() {

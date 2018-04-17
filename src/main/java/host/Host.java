@@ -9,6 +9,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Host {
 
@@ -46,16 +47,8 @@ public class Host {
         return receivingWindow;
     }
 
-    public ArrayList<String> getExpectedDownloads() {
-        return expectedDownloads;
-    }
-
-    public ArrayList<String> getExpectedUploads() {
-        return expectedUploads;
-    }
-
-    public void addExpectedDownloads(String fullFileName) {
-        expectedDownloads.add(fullFileName);
+    public void addExpectedDownloads(String fileName) {
+        expectedDownloads.add(fileName);
     }
 
     public void addExpectedUploads(String fullFileName) {
@@ -63,7 +56,12 @@ public class Host {
     }
 
     public String getExpectedDownloads(String fileName) {
-        return "";
+        for (String s : expectedDownloads) {
+            if (s.equals(fileName)) {
+                return s;
+            }
+        }
+        return null;
     }
 
     public String getExpectedUploads(String fileName) {

@@ -57,7 +57,7 @@ public class SendPacket implements Runnable {
         int nTransmissions = 0;
         boolean ackReceived = false;
 
-        if (!packet.getCommand().equals(Protocol.ACK)) {
+        if (!packet.getCommand().equals(Protocol.ACK) && !packet.getCommand().equals(Protocol.PAUSE) && !packet.getCommand().equals(Protocol.RESUME)) {
             host.getSendingWindow().confirmPacketSend(packet.getTaskNo(), packet.getSequenceNo(), packet.getTotalSequenceNo());
         }
 
@@ -68,7 +68,7 @@ public class SendPacket implements Runnable {
             }
             nTransmissions++;
 
-            if (packet.getCommand().equals(Protocol.ACK)) {
+            if (packet.getCommand().equals(Protocol.ACK) || packet.getCommand().equals(Protocol.PAUSE) || packet.getCommand().equals(Protocol.RESUME)) {
                 ackReceived = true;
             }
 

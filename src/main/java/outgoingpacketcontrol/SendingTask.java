@@ -11,14 +11,11 @@ import java.util.Arrays;
 
 public class SendingTask extends Task implements Runnable {
 
-    private Host host;
     private OutgoingData data;
-    private int taskNo;
 
     private InfoGUI infoGUI;
     private int nPackets;
     private int packetsSend;
-    private boolean isPaused;
 
     // SENDING WINDOW INFORMATION
     private ArrayList<String> receivedAcks;
@@ -31,9 +28,8 @@ public class SendingTask extends Task implements Runnable {
     private int totalLAF;
 
     public SendingTask(Host host, OutgoingData outgoingData) {
-        this.host = host;
+        super(host);
         this.data = outgoingData;
-        this.taskNo = outgoingData.getTaskNo();
 
         this.receivedAcks = new ArrayList<>();
         this.cycleNo = 0;
@@ -44,7 +40,6 @@ public class SendingTask extends Task implements Runnable {
         this.totalLAR = -1;
         this.totalLAF = Protocol.WS;
 
-        isPaused = false;
         if (host instanceof Client && data.getCommand().equals(Protocol.SENDDATA)) {
             infoGUI = new InfoGUI(this);
             String fullFileName = data.getFullFileName();
@@ -69,7 +64,7 @@ public class SendingTask extends Task implements Runnable {
         if (data.isFile()) {
             String packetString = data.getFullFileName() + Protocol.DELIMITER + data.getData().length;
             OutgoingPacket firstOutgoingPacket = new OutgoingPacket(data, data.getTaskNo(), Protocol.FIRST, packetString.getBytes(), 0, data.getLAF());
-            new Thread(new SendPacket(host, this, firstOutgoingPacket)).start();
+            new Thread(new SendPacket(getHost(), this, firstOutgoingPacket)).start();
         }
 
         for (int i = 0; i < nPackets; i++) {
@@ -99,7 +94,7 @@ public class SendingTask extends Task implements Runnable {
             }
 
             // If host is not able to send because of sliding window, wait till the window opens again (keep updating)
-            while (isPaused || (!data.getCommand().equals(Protocol.ACK) && !host.getSendingWindow().canSend(data.getTaskNo(), j))) {
+            while (isPaused() || (!data.getCommand().equals(Protocol.ACK) && !getHost().getSendingWindow().canSend(data.getTaskNo(), j))) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -108,16 +103,8 @@ public class SendingTask extends Task implements Runnable {
             }
 
             OutgoingPacket outgoingPacket = new OutgoingPacket(data, data.getTaskNo(), sequenceCmd, packet, j, data.getLAF());
-            new Thread(new SendPacket(host, this, outgoingPacket)).start();
+            new Thread(new SendPacket(getHost(), this, outgoingPacket)).start();
         }
-    }
-
-    public void setPaused(boolean isPaused) {
-        this.isPaused = isPaused;
-    }
-
-    public boolean isPaused() {
-        return isPaused;
     }
 
     public synchronized void setPacketSend() {

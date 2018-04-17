@@ -30,14 +30,14 @@ public class Protocol {
     public static final int TASKSIZE = LASTINDEX_TASK - FIRSTINDEX_TASK + 1;
 
     public static final int FIRSTINDEX_SEQUENCE = 11;
-    public static final int LASTINDEX_SEQUENCE = 11;
+    public static final int LASTINDEX_SEQUENCE = 12;
     public static final int SEQUENCESIZE = LASTINDEX_SEQUENCE - FIRSTINDEX_SEQUENCE + 1;
 
-    public static final int FIRSTINDEX_LAF = 12;
-    public static final int LASTINDEX_LAF = 12;
+    public static final int FIRSTINDEX_LAF = 13;
+    public static final int LASTINDEX_LAF = 14;
     public static final int LAFSIZE = LASTINDEX_LAF - FIRSTINDEX_LAF + 1;
 
-    public static final int FIRSTINDEX_DATA = 13;
+    public static final int FIRSTINDEX_DATA = 15;
     public static final int HEADERSIZE = CHECKSUMSIZE + COMMANDSIZE + SEQUENCECMDSIZE + LAFSIZE + TASKSIZE + SEQUENCESIZE + DATASIZESIZE;
 
     // COMMANDS (2 bytes)
@@ -73,7 +73,7 @@ public class Protocol {
     public static final int maxSequenceNo = (int) Math.pow(2, SEQUENCESIZE*8);      // maximum sequence number (1 byte)
     public static final int TIMEOUT = 3000;// Timeout for Acknowledgement (in ms)
     public static final int TIMEBEFOREREMOVE = 20000;
-    public static final int WS = maxSequenceNo / 4;                                 // Send Window Size (# packets)
+    public static final int WS = 500;                                 // Send Window Size (# packets)
 
     public static final String DELIMITER = "@@@";
     public static final int DEFAULT_SERVER_PORT = 9876;

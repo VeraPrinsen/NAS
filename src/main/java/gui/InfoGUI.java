@@ -1,5 +1,6 @@
 package gui;
 
+import host.Task;
 import outgoingpacketcontrol.SendingTask;
 
 import javax.swing.*;
@@ -9,17 +10,14 @@ import java.awt.*;
 
 public class InfoGUI extends JFrame implements ChangeListener {
 
-    private SendingTask sendingTask;
+    private Task task;
 
-    private JPanel titlePanel;
-    private JToggleButton toggleButton;
     private JLabel titleLable;
-    private JPanel progressPanel;
-    private JLabel barLable;
     private JLabel progressLable;
+    private JToggleButton toggleButton;
 
-    public InfoGUI(SendingTask sendingTask) {
-        this.sendingTask = sendingTask;
+    public InfoGUI(Task task) {
+        this.task = task;
 
         addComponents(this.getContentPane());
 
@@ -63,12 +61,12 @@ public class InfoGUI extends JFrame implements ChangeListener {
     }
 
     private void pause() {
-        sendingTask.setPaused(true);
+        task.pause();
         toggleButton.setText("Resume");
     }
 
     private void resume() {
-        sendingTask.setPaused(false);
+        task.resume();
         toggleButton.setText("Pause");
     }
 

@@ -60,6 +60,15 @@ public class SendingWindow {
         }
     }
 
+    public void processPauseResume(IncomingPacket packet) {
+        int taskNo = packet.getTaskNo();
+        if (packet.getCommand().equals(Protocol.PAUSE)) {
+            getTask(taskNo).pause();
+        } else {
+            getTask(taskNo).resume();
+        }
+    }
+
     private boolean taskExists(int taskNo) {
         return taskHashMap.containsKey(taskNo);
     }

@@ -26,8 +26,8 @@ public class ReceivingWindow {
         taskHashMap = new HashMap<>();
     }
 
-    private synchronized void addTask(int taskNo) {
-        ReceivingTask newTask = new ReceivingTask(host);
+    private synchronized void addTask(int taskNo, IncomingPacket incomingPacket) {
+        ReceivingTask newTask = new ReceivingTask(host, incomingPacket);
         taskHashMap.put(taskNo, newTask);
         (new Thread(newTask)).start();
     }
@@ -41,7 +41,7 @@ public class ReceivingWindow {
         int taskNo = incomingPacket.getTaskNo();
 
         if (!taskExists(taskNo)) {
-            addTask(taskNo);
+            addTask(taskNo, incomingPacket);
         }
 
         int totalSequenceNo = getTotalSequenceNo(taskNo, incomingPacket.getSequenceNo());
@@ -59,6 +59,15 @@ public class ReceivingWindow {
                 getTask(taskNo).setLastSeq(totalSequenceNo);
             } else if (incomingPacket.getSequenceCmd().equals(Protocol.FIRST)) {
                 getTask(taskNo).setFirstSeq(totalSequenceNo);
+                if (incomingPacket.getCommand().equals(Protocol.SENDDATA)) {
+                    String message = new String(incomingPacket.getData());
+                    String[] args = message.split(Protocol.DELIMITER);
+                    String fullFileName = args[0];
+                    String[] args2 = fullFileName.split("/");
+                    String fileName = args2[args2.length-1];
+                    int nBytes = Integer.parseInt(args[1]);
+                    getTask(taskNo).guiFirst(fileName, nBytes);
+                }
             } else if (incomingPacket.getSequenceCmd().equals(Protocol.LAST)) {
                 getTask(taskNo).setLastSeq(totalSequenceNo);
             }

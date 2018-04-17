@@ -47,7 +47,10 @@ public class DataAssembler implements Runnable {
                 break;
 
             case Protocol.DOWNLOAD_APPROVED:
-                // for now do nothing
+                if (Protocol.showInfo) {
+                    System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD_APPROVED: " +  new String(getDataArray(dataArray)) + " received");
+                }
+                Reactions.saveDownloadApproved(host, getDataArray(dataArray));
                 break;
 
             case Protocol.UPLOAD_APPROVED:

@@ -49,6 +49,11 @@ public class SocketListener implements Runnable {
                         host.getSendingWindow().processReceivedAck(incomingPacket);
                         break;
 
+                    case Protocol.PAUSE:
+                    case Protocol.RESUME:
+                        host.getSendingWindow().processPauseResume(incomingPacket);
+                        break;
+
                     default:
                         host.getReceivingWindow().processIncomingPacket(incomingPacket);
                         break;

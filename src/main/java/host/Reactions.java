@@ -1,5 +1,6 @@
 package host;
 
+import client.Client;
 import fileoperators.FileReaderClass;
 import fileoperators.FileWriterClass;
 import general.Protocol;
@@ -24,6 +25,12 @@ public class Reactions {
         host.getSendingWindow().addTask(outgoingData);
     }
 
+    public static void saveDownloadApproved(Host host, byte[] dataArray) {
+        String message = new String(dataArray);
+        String[] args = message.split(Protocol.DELIMITER);
+        host.addExpectedDownloads(args[0]);
+    }
+
     public static void sendFile(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String dataSentence = new String(data);
         String[] args = dataSentence.split(Protocol.DELIMITER);
@@ -44,8 +51,7 @@ public class Reactions {
 
     public static void saveFile(String fileName, int nBytes, byte[][] data) {
         FileWriterClass.byteArrayToFile(data, fileName);
-        System.out.println(fileName + " saved (" + nBytes + "-" + data.length + ")");
-
+        System.out.println(fileName + " saved (" + nBytes + " bytes -" + data.length + " packets)");
         // SEND A CONFIRMATION PACKET TO SOURCE
     }
 
