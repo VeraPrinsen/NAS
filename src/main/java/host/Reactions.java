@@ -15,13 +15,13 @@ public class Reactions {
     public static void sendUploadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String command = Protocol.UPLOAD_APPROVED;
         OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(host, outgoingData);
+        host.getSendingWindow().addTask(outgoingData);
     }
 
     public static void sendDownloadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String command = Protocol.DOWNLOAD_APPROVED;
         OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(host, outgoingData);
+        host.getSendingWindow().addTask(outgoingData);
     }
 
     public static void sendFile(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
@@ -39,7 +39,7 @@ public class Reactions {
 
         String command = Protocol.SENDDATA;
         OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, fullFileName, dataBytes, Protocol.WS);
-        host.getSendingWindow().addTask(host, outgoingData);
+        host.getSendingWindow().addTask(outgoingData);
     }
 
     public static void saveFile(String fileName, int nBytes, byte[][] data) {
@@ -66,7 +66,7 @@ public class Reactions {
 
         String command = Protocol.FILELIST;
         OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(host, outgoingData);
+        host.getSendingWindow().addTask(outgoingData);
     }
 
     public static void showFileList(byte[] data) {

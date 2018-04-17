@@ -1,5 +1,6 @@
 package host;
 
+import general.Protocol;
 import incomingpacketcontrol.ReceivingWindow;
 import outgoingpacketcontrol.SendingWindow;
 
@@ -19,18 +20,15 @@ public class Host {
     private ArrayList<String> expectedUploads;
 
     public Host () {
-        sendingWindow = new SendingWindow();
+        sendingWindow = new SendingWindow(this);
         receivingWindow = new ReceivingWindow(this);
         expectedDownloads = new ArrayList<>();
         expectedUploads = new ArrayList<>();
-
-        new Thread(receivingWindow).start();
     }
 
     public void send(DatagramPacket datagramPacket) {
         try {
             hostSocket.send(datagramPacket);
-            // System.out.println(datagramPacket.getAddress().toString() + "/" + datagramPacket.getPort() + " | " + new String(datagramPacket.getData()) + " send");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,15 +81,6 @@ public class Host {
 
     public void removeExpectedUploads(String fileName) {
         expectedUploads.remove(fileName);
-    }
-
-    // TODO: remove when not used
-    public void createSocket() {
-        try {
-            this.hostSocket = new DatagramSocket();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
     }
 
     public void createSocket(int portNumber) {

@@ -12,6 +12,7 @@ public class OutgoingData {
 
     private int LAF;
     private String fullFileName = null;
+    private boolean isFile;
 
     public OutgoingData(String command, InetAddress destinationIP, int destinationPort, byte[] data, int LAF) {
         this.command = command;
@@ -24,6 +25,7 @@ public class OutgoingData {
     public OutgoingData(String command, InetAddress destinationIP, int destinationPort, String fullFileName, byte[] data, int LAF) {
         this(command, destinationIP, destinationPort, data, LAF);
         this.fullFileName = fullFileName;
+        this.isFile = true;
     }
 
     public String getCommand() {
@@ -59,6 +61,6 @@ public class OutgoingData {
     }
 
     public boolean isFile() {
-        return fullFileName != null;
+        return isFile;
     }
 }

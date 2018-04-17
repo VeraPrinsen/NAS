@@ -11,8 +11,8 @@ public class Client extends Host {
     private ClientTUI clientTUI;
     private boolean keepGoing = true;
 
-    InetAddress serverIP;
-    int serverPort;
+    private InetAddress serverIP;
+    private int serverPort;
 
     public Client() {
         this.clientTUI = new ClientTUI();

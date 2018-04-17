@@ -1,6 +1,6 @@
 package host;
 
-public class Task {
+public class Task implements Runnable {
 
     private Host host;
 
@@ -8,6 +8,8 @@ public class Task {
 
     }
 
+    public void run() {
 
+    }
 
 }

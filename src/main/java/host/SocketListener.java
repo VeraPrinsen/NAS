@@ -18,6 +18,7 @@ public class SocketListener implements Runnable {
 
     public void run() {
         while (true) {
+            // Receive data and convert into byte array
             byte[] buffer = new byte[Protocol.maxPacketSize]; // empty buffer
             DatagramPacket receivePacket = new DatagramPacket(buffer, buffer.length);
             try {
@@ -40,10 +41,8 @@ public class SocketListener implements Runnable {
                 }
             }
 
+            // Process data
             IncomingPacket incomingPacket = new IncomingPacket(receivePacket.getAddress(), receivePacket.getPort(), receivedData);
-            if (Protocol.showInfo) {
-                showInfo(incomingPacket);
-            }
             if (incomingPacket.isOK()) {
                 switch (incomingPacket.getCommand()) {
                     case Protocol.ACK:
@@ -51,14 +50,10 @@ public class SocketListener implements Runnable {
                         break;
 
                     default:
-                        host.getReceivingWindow().processIncomingPackets(incomingPacket);
+                        host.getReceivingWindow().processIncomingPacket(incomingPacket);
                         break;
                 }
             }
         }
-    }
-
-    private void showInfo(IncomingPacket packet) {
-        System.out.println(packet.getSourceIP() + "/" + packet.getSourcePort() + " | " + packet.getCommand() +  "-" + packet.getTaskNo() + "-" + packet.getSequenceNo() + "-" + packet.getTotalSequenceNo() + " received");
     }
 }

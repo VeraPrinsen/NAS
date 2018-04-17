@@ -15,17 +15,16 @@ public class IncomingPacket {
 
     private InetAddress sourceIP;
     private int sourcePort;
+    private boolean isOK;
 
     private String command;
     private String sequenceCmd;
-    private int LAF;
     private int taskNo;
     private int sequenceNo;
     private int totalSequenceNo;
-    private byte[] packetSize;
-    private byte[] checkSum;
+    private int LAF;
+    private int packetSize;
     private byte[] data;
-    private boolean isOK;
 
     public IncomingPacket(InetAddress sourceIP, int sourcePort, byte[] byteMessage) {
         this.sourceIP = sourceIP;
@@ -52,8 +51,7 @@ public class IncomingPacket {
         this.LAF = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_LAF, Protocol.LASTINDEX_LAF+1));
         this.taskNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_TASK, Protocol.LASTINDEX_TASK+1));
         this.sequenceNo = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCE, Protocol.LASTINDEX_SEQUENCE+1));
-        this.packetSize = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATASIZE, Protocol.LASTINDEX_DATASIZE +1);
-        this.checkSum = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM+1);
+        this.packetSize = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATASIZE, Protocol.LASTINDEX_DATASIZE +1));
         this.data = Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_DATA, byteMessage.length);
     }
 
@@ -93,12 +91,8 @@ public class IncomingPacket {
         return totalSequenceNo;
     }
 
-    public byte[] getPacketSize() {
+    public int getPacketSize() {
         return packetSize;
-    }
-
-    public byte[] getCheckSum() {
-        return checkSum;
     }
 
     public byte[] getData() {

@@ -15,6 +15,14 @@ public class OutgoingPacket extends OutgoingData {
         this.sequenceCmd = sequenceCmd;
     }
 
+    public OutgoingPacket(OutgoingData originalData, int taskNo, String sequenceCmd, byte[] dataFragment, int totalSequenceNo, int LAF) {
+        super(originalData.getCommand(), originalData.getDestinationIP(), originalData.getDestinationPort(), dataFragment, LAF);
+        this.sequenceNo = totalSequenceNo % Protocol.maxSequenceNo;
+        this.totalSequenceNo = totalSequenceNo;
+        this.sequenceCmd = sequenceCmd;
+        super.setTaskNo(taskNo);
+    }
+
     public int getSequenceNo() {
         return sequenceNo;
     }

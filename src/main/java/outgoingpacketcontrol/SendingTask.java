@@ -13,6 +13,7 @@ public class SendingTask extends Task implements Runnable {
 
     private Host host;
     private OutgoingData data;
+    private int taskNo;
 
     private InfoGUI infoGUI;
     private int nPackets;
@@ -21,7 +22,7 @@ public class SendingTask extends Task implements Runnable {
 
     // SENDING WINDOW INFORMATION
     private ArrayList<String> receivedAcks;
-    private int ackCycle;
+    private int cycleNo;
     private int LFS;
     private int LAR;
     private int LAF;
@@ -32,9 +33,10 @@ public class SendingTask extends Task implements Runnable {
     public SendingTask(Host host, OutgoingData outgoingData) {
         this.host = host;
         this.data = outgoingData;
+        this.taskNo = outgoingData.getTaskNo();
 
         this.receivedAcks = new ArrayList<>();
-        this.ackCycle = 0;
+        this.cycleNo = 0;
         this.LFS = -1;
         this.LAR = -1;
         this.LAF = Protocol.WS;
@@ -52,6 +54,7 @@ public class SendingTask extends Task implements Runnable {
         packetsSend = 0;
     }
 
+    @Override
     public void run() {
         sendPackets();
     }
@@ -65,7 +68,7 @@ public class SendingTask extends Task implements Runnable {
 
         if (data.isFile()) {
             String packetString = data.getFullFileName() + Protocol.DELIMITER + data.getData().length;
-            OutgoingPacket firstOutgoingPacket = new OutgoingPacket(data, Protocol.FIRST, packetString.getBytes(), 0, data.getLAF());
+            OutgoingPacket firstOutgoingPacket = new OutgoingPacket(data, data.getTaskNo(), Protocol.FIRST, packetString.getBytes(), 0, data.getLAF());
             new Thread(new SendPacket(host, this, firstOutgoingPacket)).start();
         }
 
@@ -104,7 +107,7 @@ public class SendingTask extends Task implements Runnable {
                 }
             }
 
-            OutgoingPacket outgoingPacket = new OutgoingPacket(data, sequenceCmd, packet, j, data.getLAF());
+            OutgoingPacket outgoingPacket = new OutgoingPacket(data, data.getTaskNo(), sequenceCmd, packet, j, data.getLAF());
             new Thread(new SendPacket(host, this, outgoingPacket)).start();
         }
     }
@@ -134,8 +137,8 @@ public class SendingTask extends Task implements Runnable {
         return receivedAcks.size();
     }
 
-    public int getAckCycle() {
-        return ackCycle;
+    public int getCycleNo() {
+        return cycleNo;
     }
 
     public int getLFS() {
@@ -166,8 +169,8 @@ public class SendingTask extends Task implements Runnable {
         this.receivedAcks.add(receivedAck);
     }
 
-    public void setAckCycle(int ackCycle) {
-        this.ackCycle = ackCycle;
+    public void setCycleNo(int cycleNo) {
+        this.cycleNo = cycleNo;
     }
 
     public void setLFS(int LFS) {

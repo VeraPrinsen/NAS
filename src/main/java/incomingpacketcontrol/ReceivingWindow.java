@@ -14,173 +14,73 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-// TODO: Clean up
-// TODO: Receiving packets goes to quick for the LFR and LAF to keep up. Maybe some wait() and notify() ?
-// TODO: If a task was removed, and another packet comes in, do not make a new task.
-public class ReceivingWindow implements Runnable {
+public class ReceivingWindow {
 
     private Host host;
-    private boolean pauseUpdates = false;
+    private HashMap<Integer, ReceivingTask> taskHashMap;
 
-    private HashMap<Integer, ArrayList<IncomingPacket>> packetsReceived;
-    private HashMap<Integer, ArrayList<Integer>> sequenceReceived;
-    private HashMap<Integer, Integer> packetCycleNo;
-    private HashMap<Integer, Integer> packetLFR;
-    private HashMap<Integer, Integer> packetLAF;
-    private HashMap<Integer, Integer> packetTotalLFR;
-    private HashMap<Integer, Integer> packetTotalLAF;
-    private HashMap<Integer, Integer> packetFirstReceived;
-    private HashMap<Integer, Integer> packetLastReceived;
-    private HashMap<Integer, Boolean> taskDone;
-    private HashMap<Integer, Long> taskDoneTime;
-    private HashMap<Integer, InfoGUI> infoGUI;
-
-    Lock lock = new ReentrantLock();
+    // Lock lock = new ReentrantLock();
 
     public ReceivingWindow(Host host) {
         this.host = host;
-
-        packetsReceived = new HashMap<>();
-        sequenceReceived = new HashMap<>();
-        packetCycleNo = new HashMap<>();
-        packetLFR = new HashMap<>();
-        packetLAF = new HashMap<>();
-        packetTotalLFR = new HashMap<>();
-        packetTotalLAF = new HashMap<>();
-        packetFirstReceived = new HashMap<>();
-        packetLastReceived = new HashMap<>();
-        taskDone = new HashMap<>();
-        taskDoneTime = new HashMap<>();
-        infoGUI = new HashMap<>();
+        taskHashMap = new HashMap<>();
     }
 
-    public void run() {
-        while (true) {
-            if (!pauseUpdates) {
-                update();
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    private synchronized void addTask(int taskNo) {
+        ReceivingTask newTask = new ReceivingTask(host);
+        taskHashMap.put(taskNo, newTask);
+        (new Thread(newTask)).start();
     }
 
-    private void update() {
-        for (Integer taskNo : getTasks()) {
-            int totalLFR = packetTotalLFR.get(taskNo);
-            int nextLFR = totalLFR + 1;
-
-            boolean LAFchanged = false;
-            while (sequenceReceived.get(taskNo).contains(nextLFR)) {
-                packetTotalLFR.replace(taskNo, nextLFR);
-                packetLFR.replace(taskNo, getSequenceNo(nextLFR));
-                int nextLAF = nextLFR + Protocol.WS;
-                packetTotalLAF.replace(taskNo, nextLAF);
-                packetLAF.replace(taskNo, getSequenceNo(nextLAF));
-                LAFchanged = true;
-
-                totalLFR = packetTotalLFR.get(taskNo);
-                nextLFR = totalLFR + 1;
-
-                if (packetLFR.get(taskNo) == 0 && sequenceReceived.get(taskNo).size() > Protocol.maxSequenceNo) {
-                    packetCycleNo.replace(taskNo, packetCycleNo.get(taskNo) + 1);
-                }
-            }
-
-            if (LAFchanged) {
-                sendLAF(taskNo, packetsReceived.get(taskNo).get(0).getSourceIP(), packetsReceived.get(taskNo).get(0).getSourcePort());
-            }
-
-            if (packetFirstReceived.get(taskNo) >= 0 && packetLastReceived.get(taskNo) >= 0) {
-                if (isFinished(taskNo)) {
-                    // do something
-                    new Thread(new DataAssembler(host, packetsReceived.get(taskNo))).start();
-                    taskDone.replace(taskNo, true);
-                    taskDoneTime.replace(taskNo, System.currentTimeMillis());
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-                } else if (taskDone.get(taskNo) && taskDoneTime.get(taskNo) + Protocol.TIMEBEFOREREMOVE < System.currentTimeMillis()) {
-                    //System.out.println("SendingTask " + taskNo + " removed");
-                    //removeTask(taskNo);
-                }
-            }
-        }
-    }
-
-    // EVERY RECEIVED PACKET GOES THROUGH THIS METHOD
-    public void processIncomingPackets(IncomingPacket incomingPacket) {
-        receivePacket(incomingPacket);
+    private ReceivingTask getTask(int taskNo) {
+        return taskHashMap.get(taskNo);
     }
 
     // IF PACKET IS EXPECTED: SEND ACK & SAVE PACKET
-    private void receivePacket(IncomingPacket incomingPacket) {
+    public void processIncomingPacket(IncomingPacket incomingPacket) {
         int taskNo = incomingPacket.getTaskNo();
-        int totalSequenceNo;
+
         if (!taskExists(taskNo)) {
-            totalSequenceNo = incomingPacket.getSequenceNo();
-        } else {
-            totalSequenceNo = getTotalSequenceNo(taskNo, incomingPacket.getSequenceNo());
+            addTask(taskNo);
         }
+
+        int totalSequenceNo = getTotalSequenceNo(taskNo, incomingPacket.getSequenceNo());
 
         if (totalSequenceNo != -1) {
-            if (!taskExists(taskNo)) {
-                addTask(taskNo);
-            }
             incomingPacket.setTotalSequenceNo(totalSequenceNo);
-            sendAck(incomingPacket);
+            if (Protocol.showInfo) {
+                System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
+            }
 
-            packetsReceived.get(taskNo).add(incomingPacket);
-            sequenceReceived.get(taskNo).add(totalSequenceNo);
+            getTask(taskNo).addReceivedPackets(incomingPacket);
 
             if (incomingPacket.getSequenceCmd().equals(Protocol.SINGLE)) {
-                packetFirstReceived.replace(taskNo, totalSequenceNo);
-                packetLastReceived.replace(taskNo, totalSequenceNo);
+                getTask(taskNo).setFirstSeq(totalSequenceNo);
+                getTask(taskNo).setLastSeq(totalSequenceNo);
             } else if (incomingPacket.getSequenceCmd().equals(Protocol.FIRST)) {
-                packetFirstReceived.replace(taskNo, totalSequenceNo);
+                getTask(taskNo).setFirstSeq(totalSequenceNo);
             } else if (incomingPacket.getSequenceCmd().equals(Protocol.LAST)) {
-                packetLastReceived.replace(taskNo, totalSequenceNo);
+                getTask(taskNo).setLastSeq(totalSequenceNo);
             }
-        } else {
-            sendAck(incomingPacket);
         }
+
+        sendAck(incomingPacket);
     }
 
     // SENDACK
     private void sendAck(IncomingPacket incomingPacket) {
-        if (Protocol.showInfo) {
-            System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
-        }
+        int taskNo = incomingPacket.getTaskNo();
         byte[] data = new byte[1];
         data[0] = 0;
-        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, packetLAF.get(incomingPacket.getTaskNo()));
-        outgoingData.setTaskNo(incomingPacket.getTaskNo());
-        OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, incomingPacket.getSequenceNo(), packetLAF.get(incomingPacket.getTaskNo()));
+        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, getTask(taskNo).getLAF());
+        OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, taskNo, Protocol.SINGLE, data, incomingPacket.getSequenceNo(), getTask(taskNo).getLAF());
         new Thread(new SendPacket(host, null, outgoingPacket)).start();
-    }
-
-    // SENDLAF
-    private void sendLAF(int taskNo, InetAddress destinationIP, int destinationPort) {
-        byte[] data = new byte[1];
-        data[0] = 0;
-        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, destinationIP, destinationPort, data, packetLAF.get(taskNo));
-        outgoingData.setTaskNo(taskNo);
-        OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, 0, packetLAF.get(taskNo));
-        new Thread(new SendPacket(host, null, outgoingPacket)).start();
-    }
-
-    private int getSequenceNo(int totalSequenceNo) {
-        return totalSequenceNo % Protocol.maxSequenceNo;
     }
 
     private int getTotalSequenceNo(int taskNo, int sequenceNo) {
-        int LFR = packetLFR.get(taskNo);
-        int LAF = packetLAF.get(taskNo);
-        int cycleNo = packetCycleNo.get(taskNo);
+        int LFR = getTask(taskNo).getLFR();
+        int LAF = getTask(taskNo).getLAF();
+        int cycleNo = getTask(taskNo).getCycleNo();
 
         if (LFR < LAF) {
             if (sequenceNo > LFR && sequenceNo <= LAF) {
@@ -207,55 +107,7 @@ public class ReceivingWindow implements Runnable {
         }
     }
 
-    private boolean isFinished(int taskNo) {
-        int firstSequence = packetFirstReceived.get(taskNo);
-        int lastSequence = packetLastReceived.get(taskNo);
-
-        for (int i = firstSequence; i <= lastSequence; i++) {
-            if (!sequenceReceived.get(taskNo).contains(i)) {
-                return false;
-            }
-        }
-        return !taskDone.get(taskNo);
-    }
-
     private boolean taskExists(int taskNo) {
-        return packetsReceived.containsKey(taskNo);
-    }
-
-    private void addTask(int taskNo) {
-        packetsReceived.put(taskNo, new ArrayList<>());
-        sequenceReceived.put(taskNo, new ArrayList<>());
-        packetCycleNo.put(taskNo, 0);
-        packetLFR.put(taskNo, -1);
-        packetLAF.put(taskNo, Protocol.WS - 1);
-        packetTotalLFR.put(taskNo, -1);
-        packetTotalLAF.put(taskNo, Protocol.WS - 1);
-        packetFirstReceived.put(taskNo, -1);
-        packetLastReceived.put(taskNo, -1);
-        taskDone.put(taskNo, false);
-        taskDoneTime.put(taskNo, new Long(0));
-    }
-
-    private void removeTask(int taskNo) {
-        pauseUpdates = true;
-
-        packetsReceived.remove(taskNo);
-        sequenceReceived.remove(taskNo);
-        packetCycleNo.remove(taskNo);
-        packetLFR.remove(taskNo);
-        packetLAF.remove(taskNo);
-        packetTotalLFR.remove(taskNo);
-        packetTotalLAF.remove(taskNo);
-        packetFirstReceived.remove(taskNo);
-        packetLastReceived.remove(taskNo);
-        taskDone.remove(taskNo);
-        taskDoneTime.remove(taskNo);
-
-        pauseUpdates = false;
-    }
-
-    private synchronized Set<Integer> getTasks() {
-        return sequenceReceived.keySet();
+        return taskHashMap.containsKey(taskNo);
     }
 }

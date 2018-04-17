@@ -22,7 +22,7 @@ public class ClientCommands {
         byte[] dataBytes = fileName.getBytes();
         client.addExpectedDownloads(fileName);
         OutgoingData outgoingData = new OutgoingData(Protocol.DOWNLOAD, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
-        client.getSendingWindow().addTask(client, outgoingData);
+        client.getSendingWindow().addTask(outgoingData);
     }
 
     public static void upload(Client client) {
@@ -53,7 +53,7 @@ public class ClientCommands {
         String dataSentence = fileName + Protocol.DELIMITER + fileSize;
         byte[] dataBytes = dataSentence.getBytes();
         OutgoingData outgoingData = new OutgoingData(Protocol.UPLOAD, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
-        client.getSendingWindow().addTask(client, outgoingData);
+        client.getSendingWindow().addTask(outgoingData);
     }
 
     public static void fileList(Client client) {
@@ -67,6 +67,6 @@ public class ClientCommands {
         data[0] = 0;
 
         OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
-        client.getSendingWindow().addTask(client, outgoingData);
+        client.getSendingWindow().addTask(outgoingData);
     }
 }
