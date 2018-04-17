@@ -18,7 +18,6 @@ public class FileChooserClass {
                 }
             }
         });
-        System.out.println(selected.getAbsolutePath());
     }
 
     public File getFile() {

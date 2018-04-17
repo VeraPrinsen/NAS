@@ -30,8 +30,6 @@ public class TextResources {
             prt("Download a file .................. 1");
             prt("Upload a file .................... 2");
             prt("List of downloadable files ....... 3");
-            prt("Send testpacket (small) .......... 4");
-            prt("Send testpacket (large) .......... 5");
             prt("");
             prt("Exit ............................. 0");
             prt("");

@@ -41,7 +41,9 @@ public class SocketListener implements Runnable {
             }
 
             IncomingPacket incomingPacket = new IncomingPacket(receivePacket.getAddress(), receivePacket.getPort(), receivedData);
-            // showInfo(incomingPacket);
+            if (Protocol.showInfo) {
+                showInfo(incomingPacket);
+            }
             if (incomingPacket.isOK()) {
                 switch (incomingPacket.getCommand()) {
                     case Protocol.ACK:

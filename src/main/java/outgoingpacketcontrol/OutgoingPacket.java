@@ -9,7 +9,7 @@ public class OutgoingPacket extends OutgoingData {
     private String sequenceCmd;
 
     public OutgoingPacket(OutgoingData originalData, String sequenceCmd, byte[] dataFragment, int totalSequenceNo, int LAF) {
-        super(originalData.getCommand(), originalData.getTaskNo(), originalData.getDestinationIP(), originalData.getDestinationPort(), dataFragment, LAF);
+        super(originalData.getCommand(), originalData.getDestinationIP(), originalData.getDestinationPort(), dataFragment, LAF);
         this.sequenceNo = totalSequenceNo % Protocol.maxSequenceNo;
         this.totalSequenceNo = totalSequenceNo;
         this.sequenceCmd = sequenceCmd;

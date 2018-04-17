@@ -41,7 +41,7 @@ public class Client extends Host {
             TextResources.General.mainMenu();
             // kan dit ook naar TextResources? Met de client in de input?
             int response = readInt("Enter your choice");
-            while (response < 0 || response > 5) {
+            while (response < 0 || response > 3) {
                 response = readInt("Invalid option, choose again");
             }
             new ClientInputHandler(this, response);

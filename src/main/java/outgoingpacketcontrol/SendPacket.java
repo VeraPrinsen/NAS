@@ -62,7 +62,9 @@ public class SendPacket implements Runnable {
         }
         while (!ackReceived) {
             host.send(datagramPacket);
-            // System.out.println("Send: " + packet.getCommand() + "-" + packet.getTaskNo() + "-" + packet.getSequenceNo());
+            if (Protocol.showInfo) {
+                System.out.println("Send: " + packet.getCommand() + "-" + packet.getTaskNo() + "-" + packet.getSequenceNo());
+            }
             nTransmissions++;
 
             if (packet.getCommand().equals(Protocol.ACK)) {

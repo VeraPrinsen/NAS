@@ -152,10 +152,13 @@ public class ReceivingWindow implements Runnable {
 
     // SENDACK
     private void sendAck(IncomingPacket incomingPacket) {
-        // System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
+        if (Protocol.showInfo) {
+            System.out.println("Received: " + incomingPacket.getCommand() + "-" + incomingPacket.getSequenceCmd() + "-" + incomingPacket.getTaskNo() + "-" + incomingPacket.getSequenceNo() + "-" + incomingPacket.getTotalSequenceNo());
+        }
         byte[] data = new byte[1];
         data[0] = 0;
-        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getTaskNo(), incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, packetLAF.get(incomingPacket.getTaskNo()));
+        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, incomingPacket.getSourceIP(), incomingPacket.getSourcePort(), data, packetLAF.get(incomingPacket.getTaskNo()));
+        outgoingData.setTaskNo(incomingPacket.getTaskNo());
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, incomingPacket.getSequenceNo(), packetLAF.get(incomingPacket.getTaskNo()));
         new Thread(new SendPacket(host, null, outgoingPacket)).start();
     }
@@ -164,7 +167,8 @@ public class ReceivingWindow implements Runnable {
     private void sendLAF(int taskNo, InetAddress destinationIP, int destinationPort) {
         byte[] data = new byte[1];
         data[0] = 0;
-        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, taskNo, destinationIP, destinationPort, data, packetLAF.get(taskNo));
+        OutgoingData outgoingData = new OutgoingData(Protocol.ACK, destinationIP, destinationPort, data, packetLAF.get(taskNo));
+        outgoingData.setTaskNo(taskNo);
         OutgoingPacket outgoingPacket = new OutgoingPacket(outgoingData, Protocol.SINGLE, data, 0, packetLAF.get(taskNo));
         new Thread(new SendPacket(host, null, outgoingPacket)).start();
     }

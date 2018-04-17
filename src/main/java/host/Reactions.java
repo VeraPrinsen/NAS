@@ -14,18 +14,14 @@ public class Reactions {
 
     public static void sendUploadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String command = Protocol.UPLOAD_APPROVED;
-        int taskNo = host.getSendingWindow().getNewTask();
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void sendDownloadApproved(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
         String command = Protocol.DOWNLOAD_APPROVED;
-        int taskNo = host.getSendingWindow().getNewTask();
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void sendFile(Host host, byte[] data, InetAddress destinationIP, int destinationPort) {
@@ -42,16 +38,15 @@ public class Reactions {
         byte[] dataBytes = FileReaderClass.fileToByteArray(fullFileName);
 
         String command = Protocol.SENDDATA;
-        int taskNo = host.getSendingWindow().getNewTask();
-
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, fullFileName, dataBytes, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, fullFileName, dataBytes, Protocol.WS);
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void saveFile(String fileName, int nBytes, byte[][] data) {
         FileWriterClass.byteArrayToFile(data, fileName);
         System.out.println(fileName + " saved (" + nBytes + "-" + data.length + ")");
+
+        // SEND A CONFIRMATION PACKET TO SOURCE
     }
 
     public static void sendFileList(Host host, InetAddress destinationIP, int destinationPort) {
@@ -70,11 +65,8 @@ public class Reactions {
         byte[] data = message.getBytes();
 
         String command = Protocol.FILELIST;
-        int taskNo = host.getSendingWindow().getNewTask();
-
-        OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void showFileList(byte[] data) {

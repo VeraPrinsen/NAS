@@ -24,25 +24,30 @@ public class SendingWindow {
         outgoingData.setTaskNo(taskNo);
         SendingTask newTask = new SendingTask(host, outgoingData);
         taskHashMap.put(taskNo, newTask);
-        new Thread(newTask).start();
+        (new Thread(newTask)).start();
     }
 
     private boolean taskExists(int taskNo) {
-        return receivedAcks.containsKey(taskNo);
+        return taskHashMap.containsKey(taskNo);
+    }
+
+    private SendingTask getTask(int taskNo) {
+        return taskHashMap.get(taskNo);
     }
 
     public void confirmPacketSend(int taskNo, int sequenceNo, int totalSequenceNo) {
         if (taskExists(taskNo)) {
-            ackLFS.replace(taskNo, sequenceNo);
-            ackTotalLFS.replace(taskNo, totalSequenceNo);
+            getTask(taskNo).setLFS(sequenceNo);
+            getTask(taskNo).setTotalLFS(totalSequenceNo);
         } else {
-            // System.out.println("confirmPacketSend(taskNo, sequenceNo, totalSequenceNo): taskNo " + taskNo + " not known");
+            if (Protocol.showInfo) {
+                System.out.println("confirmPacketSend(taskNo, sequenceNo, totalSequenceNo): taskNo " + taskNo + " not known");
+            }
         }
     }
 
-    // TODO: CHECK IF OK
     public boolean canSend(int taskNo, int totalSequenceNo) {
-        return totalSequenceNo > ackTotalLAR.get(taskNo) && totalSequenceNo <= (ackTotalLAR.get(taskNo) + Protocol.WS) && totalSequenceNo <= receiverTotalLAF.get(taskNo);
+        return totalSequenceNo > getTask(taskNo).getTotalLAR() && totalSequenceNo <= (getTask(taskNo).getTotalLAR() + Protocol.WS) && totalSequenceNo <= getTask(taskNo).getTotalLAF();
     }
 
     public void processReceivedAck(IncomingPacket ack) {
@@ -52,34 +57,37 @@ public class SendingWindow {
         if (taskExists(taskNo)) {
             int totalSequenceNo = getTotalSequenceNo(taskNo, sequenceNo);
 
-            // TODO: CHECK: CHANGE LAF OF THE RECEIVER
-            if (receiverTotalLAF.get(taskNo) < getLAFTotalSequenceNo(taskNo, ack.getLAF())) {
-                receiverLAF.replace(taskNo, ack.getLAF());
-                receiverTotalLAF.replace(taskNo, getLAFTotalSequenceNo(taskNo, ack.getLAF()));
+            if (getTask(taskNo).getTotalLAF() < getLAFTotalSequenceNo(taskNo, ack.getLAF())) {
+                getTask(taskNo).setLAF(ack.getLAF());
+                getTask(taskNo).setTotalLAF(getLAFTotalSequenceNo(taskNo, ack.getLAF()));
             }
 
             if (totalSequenceNo != -1) {
                 String receivedAck = ackString(taskNo, totalSequenceNo);
-                receivedAcks.get(taskNo).add(receivedAck);
+                getTask(taskNo).addReceivedAck(receivedAck);
                 update(taskNo);
             } else {
-                // System.out.println("processReceivedAck(ack): ack with sequenceNo " + sequenceNo + " was not expected");
+                if (Protocol.showInfo) {
+                    System.out.println("processReceivedAck(ack): ack with sequenceNo " + sequenceNo + " was not expected");
+                }
             }
         } else {
-            // System.out.println("processReceivedAck(ack): taskNo not known, ack was not expected");
+            if (Protocol.showInfo) {
+                System.out.println("processReceivedAck(ack): taskNo not known, ack was not expected");
+            }
         }
     }
 
     public boolean hasAck(int taskNo, int totalSequenceNo) {
         String requestedAck = ackString(taskNo, totalSequenceNo);
-        if (receivedAcks.containsKey(taskNo)) {
-            return receivedAcks.get(taskNo).contains(requestedAck);
+        if (taskExists(taskNo)) {
+            return getTask(taskNo).hasAck(requestedAck);
         } else {
             return false;
         }
     }
 
-    public String ackString(int taskNo, int totalSequenceNo) {
+    private String ackString(int taskNo, int totalSequenceNo) {
         return taskNo + Protocol.DELIMITER + totalSequenceNo;
     }
 
@@ -87,11 +95,10 @@ public class SendingWindow {
         return totalSequenceNo % Protocol.maxSequenceNo;
     }
 
-    // TODO: CHECK IF OK
     private int getTotalSequenceNo(int taskNo, int sequenceNo) {
-        int LAR = ackLAR.get(taskNo);
-        int LFS = ackLFS.get(taskNo);
-        int cycleNo = ackCycle.get(taskNo);
+        int LAR = getTask(taskNo).getLAR();
+        int LFS = getTask(taskNo).getLFS();
+        int cycleNo = getTask(taskNo).getAckCycle();
 
         if (LAR < LFS) {
             if (sequenceNo > LAR && sequenceNo <= LFS) {
@@ -118,14 +125,12 @@ public class SendingWindow {
         }
     }
 
-    // TODO: Make this more elegant
-    // TODO: Sometimes program gets still stuck, fix it!!
     private int getLAFTotalSequenceNo(int taskNo, int sequenceNo) {
-        int LAR = ackLAR.get(taskNo);
-        int LFS = ackLFS.get(taskNo);
+        int LAR = getTask(taskNo).getLAR();
+        int LFS = getTask(taskNo).getLFS();
         int minLAF = getSequenceNo(LAR + Protocol.WS - 1);
         int maxLAF = getSequenceNo(LFS + 2*Protocol.WS);
-        int cycleNo = ackCycle.get(taskNo);
+        int cycleNo = getTask(taskNo).getAckCycle();
 
         if (minLAF < maxLAF) {
             if (LAR > minLAF) {
@@ -154,23 +159,21 @@ public class SendingWindow {
     }
 
     private void update(int taskNo) {
-        int totalLAR = ackTotalLAR.get(taskNo);
-        int nextAck = totalLAR + 1;
+        int nextAck = getTask(taskNo).getTotalLAR() + 1;
 
-        while (receivedAcks.get(taskNo).contains(ackString(taskNo, nextAck))) {
-            ackTotalLAR.replace(taskNo, nextAck);
-            ackLAR.replace(taskNo, getSequenceNo(nextAck));
+        while (getTask(taskNo).hasAck(ackString(taskNo, nextAck))) {
+            getTask(taskNo).setTotalLAR(nextAck);
+            getTask(taskNo).setLAR(getSequenceNo(nextAck));
 
-            totalLAR = ackTotalLAR.get(taskNo);
-            nextAck = totalLAR + 1;
+            nextAck = getTask(taskNo).getTotalLAR() + 1;
 
-            if (ackLAR.get(taskNo) == 0 && receivedAcks.get(taskNo).size() > Protocol.maxSequenceNo) {
-                ackCycle.replace(taskNo, ackCycle.get(taskNo) + 1);
+            if (getTask(taskNo).getLAR() == 0 && getTask(taskNo).getNAcksReceived() > Protocol.maxSequenceNo) {
+                getTask(taskNo).setAckCycle(getTask(taskNo).getAckCycle() + 1);
             }
         }
     }
 
-    public int getNewTask() {
+    public synchronized int getNewTask() {
         while (true) {
             if (taskExists(currentTaskNo)) {
                 currentTaskNo = (currentTaskNo + 1) % Protocol.maxTaskNo;

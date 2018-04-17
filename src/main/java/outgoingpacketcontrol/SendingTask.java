@@ -32,6 +32,16 @@ public class SendingTask extends Task implements Runnable {
     public SendingTask(Host host, OutgoingData outgoingData) {
         this.host = host;
         this.data = outgoingData;
+
+        this.receivedAcks = new ArrayList<>();
+        this.ackCycle = 0;
+        this.LFS = -1;
+        this.LAR = -1;
+        this.LAF = Protocol.WS;
+        this.totalLFS = -1;
+        this.totalLAR = -1;
+        this.totalLAF = Protocol.WS;
+
         isPaused = false;
         if (host instanceof Client && data.getCommand().equals(Protocol.SENDDATA)) {
             infoGUI = new InfoGUI(this);
@@ -116,8 +126,12 @@ public class SendingTask extends Task implements Runnable {
         }
     }
 
-    public ArrayList<String> getReceivedAcks() {
-        return receivedAcks;
+    public boolean hasAck(String requestedAck) {
+        return receivedAcks.contains(requestedAck);
+    }
+
+    public int getNAcksReceived() {
+        return receivedAcks.size();
     }
 
     public int getAckCycle() {
@@ -147,4 +161,37 @@ public class SendingTask extends Task implements Runnable {
     public int getTotalLAF() {
         return totalLAF;
     }
+
+    public void addReceivedAck(String receivedAck) {
+        this.receivedAcks.add(receivedAck);
+    }
+
+    public void setAckCycle(int ackCycle) {
+        this.ackCycle = ackCycle;
+    }
+
+    public void setLFS(int LFS) {
+        this.LFS = LFS;
+    }
+
+    public void setLAR(int LAR) {
+        this.LAR = LAR;
+    }
+
+    public void setLAF(int LAF) {
+        this.LAF = LAF;
+    }
+
+    public void setTotalLFS(int totalLFS) {
+        this.totalLFS = totalLFS;
+    }
+
+    public void setTotalLAR(int totalLAR) {
+        this.totalLAR = totalLAR;
+    }
+
+    public void setTotalLAF(int totalLAF) {
+        this.totalLAF = totalLAF;
+    }
+
 }

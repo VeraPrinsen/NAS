@@ -31,14 +31,6 @@ public class ClientInputHandler {
                 ClientCommands.fileList(client);
                 break;
 
-            case 4:
-                ClientCommands.testSmallData(client);
-                break;
-
-            case 5:
-                ClientCommands.testLargeData(client);
-                break;
-
             default:
                 // Unknown command
         }
