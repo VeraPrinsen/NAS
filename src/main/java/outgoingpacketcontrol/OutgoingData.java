@@ -31,6 +31,10 @@ public class OutgoingData {
         return command;
     }
 
+    public void setTaskNo(int taskNo) {
+        this.taskNo = taskNo;
+    }
+
     public int getTaskNo() {
         return taskNo;
     }

@@ -1,6 +1,7 @@
 package outgoingpacketcontrol;
 
 import general.Protocol;
+import host.Host;
 import incomingpacketcontrol.IncomingPacket;
 
 import java.util.ArrayList;
@@ -9,39 +10,21 @@ import java.util.HashMap;
 // TODO: Clean up
 public class SendingWindow {
 
-    private HashMap<Integer, ArrayList<String>> receivedAcks;
-    private HashMap<Integer, Integer> ackCycle;
-    private HashMap<Integer, Integer> ackLAR;
-    private HashMap<Integer, Integer> ackLFS;
-    private HashMap<Integer, Integer> receiverLAF;
-    private HashMap<Integer, Integer> ackTotalLAR;
-    private HashMap<Integer, Integer> ackTotalLFS;
-    private HashMap<Integer, Integer> receiverTotalLAF;
+    private HashMap<Integer, SendingTask> taskHashMap;
     private int currentTaskNo;
 
     public SendingWindow() {
-        receivedAcks = new HashMap<>();
-        ackCycle = new HashMap<>();
-        ackLAR = new HashMap<>();
-        ackLFS = new HashMap<>();
-        receiverLAF = new HashMap<>();
-        ackTotalLAR = new HashMap<>();
-        ackTotalLFS = new HashMap<>();
-        receiverTotalLAF = new HashMap<>();
-
+        taskHashMap = new HashMap<>();
         currentTaskNo = 0;
     }
 
     // When a host begins transmitting a new task, this is made to control the acks that will come back
-    public void addTask(int taskNo) {
-        receivedAcks.put(taskNo, new ArrayList<>());
-        ackCycle.put(taskNo, 0);
-        ackLAR.put(taskNo, -1);
-        ackLFS.put(taskNo, -1);
-        receiverLAF.put(taskNo, Protocol.WS - 1);
-        ackTotalLAR.put(taskNo, -1);
-        ackTotalLFS.put(taskNo, -1);
-        receiverTotalLAF.put(taskNo, Protocol.WS - 1);
+    public void addTask(Host host, OutgoingData outgoingData) {
+        int taskNo = getNewTask();
+        outgoingData.setTaskNo(taskNo);
+        SendingTask newTask = new SendingTask(host, outgoingData);
+        taskHashMap.put(taskNo, newTask);
+        new Thread(newTask).start();
     }
 
     private boolean taskExists(int taskNo) {

@@ -4,10 +4,12 @@ import client.Client;
 import general.Protocol;
 import gui.InfoGUI;
 import host.Host;
+import host.Task;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SendingTask implements Runnable {
+public class SendingTask extends Task implements Runnable {
 
     private Host host;
     private OutgoingData data;
@@ -16,6 +18,16 @@ public class SendingTask implements Runnable {
     private int nPackets;
     private int packetsSend;
     private boolean isPaused;
+
+    // SENDING WINDOW INFORMATION
+    private ArrayList<String> receivedAcks;
+    private int ackCycle;
+    private int LFS;
+    private int LAR;
+    private int LAF;
+    private int totalLFS;
+    private int totalLAR;
+    private int totalLAF;
 
     public SendingTask(Host host, OutgoingData outgoingData) {
         this.host = host;
@@ -102,5 +114,37 @@ public class SendingTask implements Runnable {
         } else {
             infoGUI.setProgressLable(packetsSend + " of " + (nPackets + 1) + " send");
         }
+    }
+
+    public ArrayList<String> getReceivedAcks() {
+        return receivedAcks;
+    }
+
+    public int getAckCycle() {
+        return ackCycle;
+    }
+
+    public int getLFS() {
+        return LFS;
+    }
+
+    public int getLAR() {
+        return LAR;
+    }
+
+    public int getLAF() {
+        return LAF;
+    }
+
+    public int getTotalLFS() {
+        return totalLFS;
+    }
+
+    public int getTotalLAR() {
+        return totalLAR;
+    }
+
+    public int getTotalLAF() {
+        return totalLAF;
     }
 }

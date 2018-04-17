@@ -24,8 +24,7 @@ public class ClientCommands {
         client.addExpectedDownloads(fileName);
         int taskNo = client.getSendingWindow().getNewTask();
         OutgoingData outgoingData = new OutgoingData(Protocol.DOWNLOAD, taskNo, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
-        client.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(client, outgoingData)).start();
+        client.getSendingWindow().addTask(client, outgoingData);
     }
 
     public static void upload(Client client) {
@@ -53,9 +52,8 @@ public class ClientCommands {
         byte[] dataBytes = dataSentence.getBytes();
         int taskNo = client.getSendingWindow().getNewTask();
 
-        OutgoingData outgoingData = new OutgoingData(Protocol.UPLOAD, taskNo, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
-        client.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(client, outgoingData)).start();
+        OutgoingData outgoingData = new OutgoingData(Protocol.UPLOAD, 0, client.getServerIP(), client.getServerPort(), dataBytes, Protocol.WS);
+        client.getSendingWindow().addTask(client, outgoingData);
     }
 
     public static void fileList(Host host) {
@@ -70,8 +68,7 @@ public class ClientCommands {
         data[0] = 0;
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void testSmallData(Host host) {
@@ -82,8 +79,7 @@ public class ClientCommands {
         byte[] data = "Dit is een stuk data".getBytes();
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void testLargeData(Host host) {
@@ -97,8 +93,7 @@ public class ClientCommands {
                 "Tien jaar geleden hadden er foto’s gestaan van iets wat verdacht veel op een roze strandbal, met verschillende kleuren gebreide mutsjes op, had geleden. Nu stonden er foto’s van een enorm dik, blond jongentje dat op zijn eerste fiets reed, in een draaimolen zat, een computer spelletje speelde met zijn vader en geknuffeld en gekust werd door zijn moeder. Dirk Duffeling was overduidelijk geen baby meer.";
         byte[] data = sentence.getBytes();
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void textExtraLargeData(Host host) {
@@ -129,8 +124,7 @@ public class ClientCommands {
         sentence = sentence.concat(sentence);
         byte[] data = sentence.getBytes();
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
     public static void testFileData(Host host) {
@@ -149,8 +143,7 @@ public class ClientCommands {
         int taskNo = host.getSendingWindow().getNewTask();
 
         OutgoingData outgoingData = new OutgoingData(command, taskNo, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(taskNo);
-        new Thread(new SendingTask(host, outgoingData)).start();
+        host.getSendingWindow().addTask(host, outgoingData);
     }
 
 }
