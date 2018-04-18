@@ -21,7 +21,7 @@ public class InfoGUI extends JFrame implements ChangeListener {
 
         addComponents(this.getContentPane());
 
-        this.setSize(300, 100);
+        this.setSize(500, 200);
         this.setVisible(true);
     }
 

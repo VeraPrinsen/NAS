@@ -27,8 +27,14 @@ public class SendingTask extends Task implements Runnable {
     private int totalLAR;
     private int totalLAF;
 
+    private int retransmissions;
+    private long beginTask;
+    private long endTask;
+
     public SendingTask(Host host, OutgoingData outgoingData) {
         super(host);
+        this.beginTask = System.currentTimeMillis();
+        this.retransmissions = 0;
         this.data = outgoingData;
 
         this.receivedAcks = new ArrayList<>();
@@ -105,6 +111,10 @@ public class SendingTask extends Task implements Runnable {
             OutgoingPacket outgoingPacket = new OutgoingPacket(data, data.getTaskNo(), sequenceCmd, packet, j, data.getLAF());
             new Thread(new SendPacket(getHost(), this, outgoingPacket)).start();
         }
+
+        if (data.getCommand().equals(Protocol.HELLO)) {
+            getHost().setBroadCast(false);
+        }
     }
 
     public synchronized void setPacketSend() {
@@ -112,8 +122,25 @@ public class SendingTask extends Task implements Runnable {
         if (packetsSend == nPackets+1) {
             infoGUI.setProgressLable("Server is saving the file...");
         } else {
-            infoGUI.setProgressLable(packetsSend + " of " + (nPackets + 1) + " send");
+            infoGUI.setProgressLable(packetsSend + " of " + (nPackets + 1) + " send.");
         }
+    }
+
+    public void fileTransmissionDone() {
+        this.endTask = System.currentTimeMillis();
+        long transmissionTime = endTask - beginTask;
+        int nBytes = data.getData().length;
+
+        if (getHost() instanceof Client && data.getCommand().equals(Protocol.SENDDATA)) {
+            String line1 = nBytes + " bytes send in " + (transmissionTime/1000) + " seconds (" + (nBytes/(transmissionTime/1000)) + " bytes/sec)";
+            String line2 = retransmissions + " packets had to be retransmitted.";
+            String message = "<html>" + line1 + "<br/>" + line2 + "</html>";
+            infoGUI.setProgressLable(message);
+        }
+    }
+
+    public synchronized void addRetransmissions(int retransmissions) {
+        this.retransmissions = this.retransmissions + retransmissions;
     }
 
     public boolean hasAck(String requestedAck) {

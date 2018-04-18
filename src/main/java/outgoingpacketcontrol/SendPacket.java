@@ -7,6 +7,7 @@ import general.Protocol;
 import general.Utils;
 
 import java.net.DatagramPacket;
+import java.net.SocketException;
 
 public class SendPacket implements Runnable {
 
@@ -25,6 +26,9 @@ public class SendPacket implements Runnable {
         DatagramPacket datagramPacket = createPacket();
         if (datagramPacket != null) {
             int transmission = sendPacket(datagramPacket);
+            if (packet.getCommand().equals(Protocol.SENDDATA)) {
+                sendingTask.addRetransmissions(transmission-1);
+            }
         } else {
             System.out.println("Size of packet wasn't good");
         }
@@ -47,7 +51,16 @@ public class SendPacket implements Runnable {
 
         sendData = Utils.byteConcat(bChecksum, sendData);
         if (nBytes == sendData.length) {
-            return new DatagramPacket(sendData, sendData.length, packet.getDestinationIP(), packet.getDestinationPort());
+            try {
+                if (packet.getDestinationIP() == null && host.getHostSocket().getBroadcast()) {
+                    return new DatagramPacket(sendData, sendData.length);
+                } else {
+                    return new DatagramPacket(sendData, sendData.length, packet.getDestinationIP(), packet.getDestinationPort());
+                }
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+            return null;
         } else {
             return null;
         }

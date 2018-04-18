@@ -5,6 +5,8 @@ import general.Protocol;
 import general.Utils;
 import host.Reactions;
 import client.Client;
+import server.Server;
+
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +32,21 @@ public class DataAssembler implements Runnable {
         InetAddress sourceIP = packetList.get(0).getSourceIP();
         int sourcePort = packetList.get(0).getSourcePort();
         switch (command) {
+            case Protocol.HELLO:
+                if (Protocol.showInfo) {
+                    System.out.println(sourceIP.toString() + "/" + sourcePort + " | HELLO received");
+                }
+                Reactions.sendIP(host, sourceIP, sourcePort);
+                break;
+
+            case Protocol.HELLOIP:
+                byte[] byteData = packetList.get(0).getData();
+                String stringData = new String(byteData);
+                String[] dataArgs = stringData.split(Protocol.DELIMITER);
+                ((Client) host).setServerIP(dataArgs[0]);
+                ((Client) host).setServerPort(Integer.parseInt(dataArgs[1]));
+                break;
+
             case Protocol.DOWNLOAD:
                 if (Protocol.showInfo) {
                     System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(getDataArray(dataArray)) + " received");
@@ -58,6 +75,13 @@ public class DataAssembler implements Runnable {
                     System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD_APPROVED: " +  new String(getDataArray(dataArray)) + " received");
                 }
                 Reactions.sendFile(host, getDataArray(dataArray), sourceIP, sourcePort);
+                break;
+
+            case Protocol.UPLOAD_SAVED:
+                if (Protocol.showInfo) {
+                    System.out.println(sourceIP.toString() + "/" + sourcePort + " | UPLOAD_SAVED received");
+                }
+                host.getSendingWindow().fileTransmissionDone(packetList.get(0).getTaskNo());
                 break;
 
             case Protocol.REQUEST_FILELIST:
@@ -95,6 +119,11 @@ public class DataAssembler implements Runnable {
                 byte[][] dataArray2 = Arrays.copyOfRange(dataArray, 1, dataArray.length);
 
                 Reactions.saveFile(pathName + fileName, nBytes, dataArray2);
+                if (host instanceof Server) {
+                    Reactions.sendUploadSaved(host, packetList);
+                } else {
+                    host.getSendingWindow().fileTransmissionDone(packetList.get(0).getTaskNo());
+                }
                 break;
 
             default:

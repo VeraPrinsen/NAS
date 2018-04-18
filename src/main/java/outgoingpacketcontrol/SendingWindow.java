@@ -187,6 +187,10 @@ public class SendingWindow {
         }
     }
 
+    public void fileTransmissionDone(int taskNo) {
+        getTask(taskNo).fileTransmissionDone();
+    }
+
     public int getNewTask() {
         while (true) {
             if (taskExists(currentTaskNo)) {

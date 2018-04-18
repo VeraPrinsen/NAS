@@ -41,6 +41,9 @@ public class Protocol {
     public static final int HEADERSIZE = CHECKSUMSIZE + COMMANDSIZE + SEQUENCECMDSIZE + LAFSIZE + TASKSIZE + SEQUENCESIZE + DATASIZESIZE;
 
     // COMMANDS (2 bytes)
+    public static final String HELLO = "HL";
+    public static final String HELLOIP = "IP";
+
     public static final String DOWNLOAD = "DL";
     public static final String DOWNLOAD_APPROVED = "DA";
     public static final String DOWNLOAD_DENIED = "DD";
@@ -59,6 +62,7 @@ public class Protocol {
     public static final String DATA_RECEIVED = "DR";
     public static final String PAUSE = "PS";
     public static final String RESUME = "RS";
+    public static final String UPLOAD_SAVED = "US";
 
     // Says something about how many more packets are coming
     public static final String FIRST = "FS";

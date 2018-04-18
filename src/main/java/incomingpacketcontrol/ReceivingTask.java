@@ -112,7 +112,6 @@ public class ReceivingTask extends Task {
                 cycleNo++;
             }
 
-            System.out.println("nPackets: " + nPackets);
             if (nPackets != 0) {
                 if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
                     infoGUI.setProgressLable(receivedSequenceNo.size() + " of " + nPackets + " received");
