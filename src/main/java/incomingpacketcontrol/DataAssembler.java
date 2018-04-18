@@ -11,6 +11,9 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * If all the packets are received of a task, this class is used to assemble the data and respond on it.
+ */
 public class DataAssembler implements Runnable {
 
     private Host host;
@@ -22,6 +25,7 @@ public class DataAssembler implements Runnable {
     }
 
     public void run() {
+        // Save data in an array of byte arrays
         byte[][] dataArray = new byte[packetList.size()][];
         for (int i = 0; i < packetList.size(); i++) {
             dataArray[packetList.get(i).getTotalSequenceNo()] = packetList.get(i).getData();
@@ -30,6 +34,9 @@ public class DataAssembler implements Runnable {
         String command = packetList.get(0).getCommand();
         InetAddress sourceIP = packetList.get(0).getSourceIP();
         int sourcePort = packetList.get(0).getSourcePort();
+
+        // Forward data to the right response
+        // TODO: a lot of duplicate code here with the println()....
         switch (command) {
             case Protocol.DOWNLOAD:
                 if (Protocol.showInfo) {
@@ -83,6 +90,7 @@ public class DataAssembler implements Runnable {
                 break;
 
             case Protocol.SENDDATA:
+                // TODO: This should be in it's own Reactions.method()
                 String pathName;
                 if (host instanceof Client) {
                     pathName = Protocol.SAVEPATH_CLIENT;
@@ -115,6 +123,9 @@ public class DataAssembler implements Runnable {
         }
     }
 
+    /**
+     * Concatenate the array of byte arrays into one byte array
+     */
     public byte[] getDataArray(byte[][] dataPackets) {
         byte[] data = dataPackets[0];
         if (dataPackets.length > 1) {

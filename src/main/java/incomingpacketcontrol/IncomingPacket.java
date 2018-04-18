@@ -11,6 +11,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
+/**
+ * The received byte array is translated into the header and data given the protocol
+ */
 public class IncomingPacket {
 
     private InetAddress sourceIP;
@@ -33,6 +36,10 @@ public class IncomingPacket {
         checkMessage(byteMessage);
     }
 
+    /**
+     * Check if the CRC of the received data is the same as the CRC that was send with the data.
+     * TODO: Apparently the DatagramSocket and DatagramPackets already have this, so this is redundant. Checking the CRC of the whole data (multiple packets) should be done
+     */
     private void checkMessage(byte[] byteMessage) {
         int checksumSource = Utils.byteArrayToInt(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_CHECKSUM, Protocol.LASTINDEX_CHECKSUM+1));
         int checksumReceiver = CyclicRedundancyCheck.checksum(Arrays.copyOfRange(byteMessage, Protocol.LASTINDEX_CHECKSUM+1, byteMessage.length));
@@ -45,6 +52,11 @@ public class IncomingPacket {
         }
     }
 
+    /**
+     * Disect the message into its header and data.
+     * The header is also being seperated into the flags
+     *      command, sequenceCmd, taskNo, sequenceNo, LAF, packetSize
+     */
     private void dissectMessage(byte[] byteMessage) {
         this.command = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_COMMAND, Protocol.LASTINDEX_COMMAND+1));
         this.sequenceCmd = new String(Arrays.copyOfRange(byteMessage, Protocol.FIRSTINDEX_SEQUENCECMD, Protocol.LASTINDEX_SEQUENCECMD+1));
@@ -89,10 +101,6 @@ public class IncomingPacket {
 
     public int getTotalSequenceNo() {
         return totalSequenceNo;
-    }
-
-    public int getPacketSize() {
-        return packetSize;
     }
 
     public byte[] getData() {

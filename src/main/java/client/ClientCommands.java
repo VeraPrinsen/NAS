@@ -10,6 +10,10 @@ import java.net.InetAddress;
 
 public class ClientCommands {
 
+    /**
+     * When client chooses to download, client must enter a filename
+     * This filename will be requested for download at the server
+     */
     public static void download(Client client) {
         // OTHER IDEA:
         // ASK SERVER FOR FILELIST
@@ -24,6 +28,10 @@ public class ClientCommands {
         client.getSendingWindow().addTask(outgoingData);
     }
 
+    /**
+     * When client chooses to upload, a window will pop up in which a file can be selected to be uploaded
+     * This filename will be requested for upload to the server
+     */
     public static void upload(Client client) {
         // REQUEST IF YOU CAN UPLOAD A SPECIFIC FILE
         // IF APPROVED, SEND ALL DATA OF THE FILE
@@ -55,6 +63,9 @@ public class ClientCommands {
         client.getSendingWindow().addTask(outgoingData);
     }
 
+    /**
+     * A request for a list of files will be send to the server
+     */
     public static void fileList(Client client) {
         // ASK FOR FILELIST
         // RECEIVE PACKETS AND SHOW FILELIST

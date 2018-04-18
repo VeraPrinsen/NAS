@@ -35,10 +35,20 @@ public class Host {
         }
     }
 
+    // GET & SET SOCKET INFO
+    public void createSocket(int portNumber) {
+        try {
+            this.hostSocket = new DatagramSocket(portNumber);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
+
     public DatagramSocket getHostSocket() {
         return hostSocket;
     }
 
+    // GET & SET Sending- and Receivingwindow
     public SendingWindow getSendingWindow() {
         return sendingWindow;
     }
@@ -46,22 +56,13 @@ public class Host {
     public ReceivingWindow getReceivingWindow() {
         return receivingWindow;
     }
-
+    
     public void addExpectedDownloads(String fileName) {
         expectedDownloads.add(fileName);
     }
 
     public void addExpectedUploads(String fullFileName) {
         expectedUploads.add(fullFileName);
-    }
-
-    public String getExpectedDownloads(String fileName) {
-        for (String s : expectedDownloads) {
-            if (s.equals(fileName)) {
-                return s;
-            }
-        }
-        return null;
     }
 
     public String getExpectedUploads(String fileName) {
@@ -73,19 +74,5 @@ public class Host {
         return null;
     }
 
-    public void removeExpectedDownloads(String fileName) {
-        expectedDownloads.remove(fileName);
-    }
 
-    public void removeExpectedUploads(String fileName) {
-        expectedUploads.remove(fileName);
-    }
-
-    public void createSocket(int portNumber) {
-        try {
-            this.hostSocket = new DatagramSocket(portNumber);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
 }

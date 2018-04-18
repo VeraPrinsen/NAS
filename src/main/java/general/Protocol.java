@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class Protocol {
 
-    public static final boolean onPi = true;
+    public static final boolean onPi = false;
     public static final boolean showInfo = true;
 
     // HEADER INFO

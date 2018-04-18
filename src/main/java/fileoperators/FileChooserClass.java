@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
+/**
+ * Opens a new window in which a file can be selected. The file will be returned into a File object
+ */
 public class FileChooserClass {
     private File selected;
 

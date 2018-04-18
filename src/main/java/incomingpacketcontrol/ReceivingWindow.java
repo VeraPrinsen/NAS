@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The ReceivingWindow controls all incoming packets and forwards them to the right task.
+ */
 public class ReceivingWindow {
 
     private Host host;

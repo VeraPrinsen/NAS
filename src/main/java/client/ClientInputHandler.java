@@ -1,6 +1,8 @@
 package client;
 
-// Is not yet a new Thread, so no input can be given before this is resolved.
+/**
+ * When an option is choosen from the mainmenu, this class forwards it to the right method.
+ */
 public class ClientInputHandler {
 
     private Client client;
@@ -12,7 +14,6 @@ public class ClientInputHandler {
         start();
     }
 
-    // TODO: Make tasks for client input commands
     private void start() {
         switch (choice) {
             case 0:

@@ -18,7 +18,6 @@ public class SendingTask extends Task implements Runnable {
     private int packetsSend;
 
     // SENDING WINDOW INFORMATION
-
     private ArrayList<String> receivedAcks;
     private int cycleNo;
     private int LFS;

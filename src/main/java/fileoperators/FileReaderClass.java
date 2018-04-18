@@ -8,6 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 
+/**
+ * Reads a file into a byte array.
+ */
 public class FileReaderClass {
 
     public static byte[] fileToByteArray(String filename) {
@@ -22,13 +25,5 @@ public class FileReaderClass {
         }
 
         return bArray;
-//        byte[] bArray = new byte[0];
-//        File file = new File(filename);
-//        try {
-//            bArray = Files.readAllBytes(file.toPath());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return bArray;
     }
 }

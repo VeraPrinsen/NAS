@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+/**
+ * Writes a byte array piece for piece into a file.
+ */
 public class FileWriterClass {
 
     public static void byteArrayToFile(byte[][] bArray, String outputFilename) {

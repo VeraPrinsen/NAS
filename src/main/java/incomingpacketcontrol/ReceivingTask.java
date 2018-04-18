@@ -12,6 +12,10 @@ import outgoingpacketcontrol.SendPacket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 
+/**
+ * All packets of a specific task will be controlled using the ReceivingTask class.
+ * The class checks if it has received all packets and will forward it to the DataAssembler when it has.
+ */
 public class ReceivingTask extends Task {
 
     private InfoGUI infoGUI;
@@ -88,6 +92,9 @@ public class ReceivingTask extends Task {
         new Thread(new SendPacket(getHost(), null, outgoingPacket)).start();
     }
 
+    /**
+     * Class keeps calling update() to perform all checks.
+     */
     @Override
     public void run() {
         while (true) {
@@ -100,6 +107,12 @@ public class ReceivingTask extends Task {
         }
     }
 
+    /**
+     * Keeps checking the following things:
+     * For the receiving window: Which sequenceNumber are expected (What are the LFR and LAR)
+     * If the LAR changes, send a new packet to the source (This is because of the thread situation)
+     * Checks if all the packets of the task are received, if this is the case, forward to DataAssembler
+     */
     private void update() {
         int nextLFR = totalLFR + 1;
 
@@ -194,7 +207,7 @@ public class ReceivingTask extends Task {
         long transmissionTime = endTask - beginTask;
 
         if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
-            String line1 = nBytes + " bytes received in " + (transmissionTime/1000) + " seconds (" + (nBytes/(transmissionTime/1000)) + " bytes/sec)";
+            String line1 = nBytes + " bytes received in " + (transmissionTime / 1000) + " seconds (" + (nBytes / (transmissionTime / 1000)) + " bytes/sec)";
             String message = line1;
             infoGUI.setProgressLable(message);
         }
@@ -212,42 +225,6 @@ public class ReceivingTask extends Task {
         return LAF;
     }
 
-    public int getTotalLFR() {
-        return totalLFR;
-    }
-
-    public int getTotalLAF() {
-        return totalLAF;
-    }
-
-    public int getFirstSeq() {
-        return firstSeq;
-    }
-
-    public int getLastSeq() {
-        return lastSeq;
-    }
-
-    public boolean isTaskDone() {
-        return taskDone;
-    }
-
-    public void setLFR(int LFR) {
-        this.LFR = LFR;
-    }
-
-    public void setLAF(int LAF) {
-        this.LAF = LAF;
-    }
-
-    public void setTotalLFR(int totalLFR) {
-        this.totalLFR = totalLFR;
-    }
-
-    public void setTotalLAF(int totalLAF) {
-        this.totalLAF = totalLAF;
-    }
-
     public void setFirstSeq(int firstSeq) {
         this.firstSeq = firstSeq;
     }
@@ -256,11 +233,4 @@ public class ReceivingTask extends Task {
         this.lastSeq = lastSeq;
     }
 
-    public void setTaskDone(boolean taskDone) {
-        this.taskDone = taskDone;
-    }
-
-    public void setTaskDoneTime(long time) {
-        this.taskDoneTime = time;
-    }
 }

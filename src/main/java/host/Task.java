@@ -2,6 +2,11 @@ package host;
 
 import gui.InfoGUI;
 
+/**
+ * Each packet that is send belongs to a general Task.
+ * A task has a taskNo and can be paused.
+ * TODO: Implement taskNo here, not in the specific Tasks
+ */
 public class Task implements Runnable {
 
     private Host host;

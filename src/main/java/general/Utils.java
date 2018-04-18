@@ -7,6 +7,9 @@ import java.nio.ByteBuffer;
 
 public class Utils {
 
+    /**
+     * Concatenates a variable number of byte arrays to each other
+     */
     public static byte[] byteConcat(byte[]... args) {
         byte[] arrayA = args[0];
 
@@ -19,6 +22,9 @@ public class Utils {
         return arrayA;
     }
 
+    /**
+     * Concatenates 2 byte arrays to each other
+     */
     public static byte[] concat2byte(byte[] arrayA, byte[] arrayB) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         try {
@@ -31,6 +37,9 @@ public class Utils {
         return outputStream.toByteArray( );
     }
 
+    /**
+     * converts a byte array into an integer value
+     */
     public static int byteArrayToInt(byte[] byteArray) {
         int tempInt = 0;
         for (int i = 0; i < byteArray.length; i++) {
@@ -39,6 +48,10 @@ public class Utils {
         return tempInt;
     }
 
+    /**
+     * converts a integer into a byte array of nBytes
+     * if the integer cannot fit in that many bytes, null is returned.
+     */
     public static byte[] intToByteArray(int value, int nBytes) {
         if (Math.pow(2,nBytes*8) > value-1) {
             byte[] tempByte = new byte[nBytes];

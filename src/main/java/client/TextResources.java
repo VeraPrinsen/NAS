@@ -42,10 +42,6 @@ public class TextResources {
 
     }
 
-    public static class Download {
-
-    }
-
     private static void prt(String msg) {
         System.out.println(msg);
     }

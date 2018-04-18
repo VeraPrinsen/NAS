@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
  *
  * @author vera.prinsen
  */
-// TODO: Clean up EXIT code
+
 public class ClientTUI {
 
     private BufferedReader in;
@@ -35,9 +35,6 @@ public class ClientTUI {
             msg = in.readLine();
             return msg;
         } catch (IOException e) {
-            // Client console is disconnected:
-            // send server that client is not available and will exit.
-            // return Protocol.Client.EXIT;
             return "EXIT";
         }
     }

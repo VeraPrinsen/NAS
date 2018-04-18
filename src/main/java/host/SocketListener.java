@@ -8,6 +8,9 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 
+/**
+ * The SocketListener is the class that constantly listens for messages.
+ */
 public class SocketListener implements Runnable {
 
     private Host host;
@@ -41,7 +44,7 @@ public class SocketListener implements Runnable {
                 }
             }
 
-            // Process data
+            // Process data, data is saved in the IncomingPacket class and forwarded to the right window (Sending / Receiving)
             IncomingPacket incomingPacket = new IncomingPacket(receivePacket.getAddress(), receivePacket.getPort(), receivedData);
             if (incomingPacket.isOK()) {
                 switch (incomingPacket.getCommand()) {

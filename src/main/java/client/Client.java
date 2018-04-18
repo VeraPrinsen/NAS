@@ -35,7 +35,7 @@ public class Client extends Host {
 
     /**
      * Starts the client
-     *      Show options
+     *      Show options menu
      */
     private void start() {
         TextResources.General.welcomeMessage();
