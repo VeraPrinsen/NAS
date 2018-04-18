@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 
 public class Protocol {
 
-    public static final boolean onPi = false;
+    public static final boolean onPi = true;
     public static final boolean showInfo = true;
 
     // HEADER INFO
@@ -74,6 +74,7 @@ public class Protocol {
     public static final int maxSequenceNo = (int) Math.pow(2, SEQUENCESIZE*8);      // maximum sequence number (1 byte)
     public static final int TIMEOUT = 3000;// Timeout for Acknowledgement (in ms)
     public static final int TIMEBEFOREREMOVE = 20000;
+    // public static final int WS = maxSequenceNo / 3;                                 // Send Window Size (# packets)
     public static final int WS = 500;                                 // Send Window Size (# packets)
 
     public static final String DELIMITER = "@@@";
