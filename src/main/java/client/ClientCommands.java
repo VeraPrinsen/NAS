@@ -8,7 +8,6 @@ import outgoingpacketcontrol.OutgoingData;
 import java.io.File;
 import java.net.InetAddress;
 
-// TODO: Implement tasks Client input
 public class ClientCommands {
 
     public static void download(Client client) {

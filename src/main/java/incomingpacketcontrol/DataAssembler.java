@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-// TODO: What must be done after receiving all these data?
 public class DataAssembler implements Runnable {
 
     private Host host;
