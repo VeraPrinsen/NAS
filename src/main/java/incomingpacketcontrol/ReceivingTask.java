@@ -31,15 +31,21 @@ public class ReceivingTask extends Task {
     private int firstSeq;
     private int lastSeq;
 
+    private int nBytes;
     private int nPackets;
 
     private boolean taskDone;
     private long taskDoneTime;
 
+    private long beginTask;
+    private long endTask;
+
     public ReceivingTask(Host host, IncomingPacket incomingPacket) {
         super(host);
         this.receivedPackets = new ArrayList<>();
         this.receivedSequenceNo = new ArrayList<>();
+
+        this.beginTask = System.currentTimeMillis();
 
         this.command = incomingPacket.getCommand();
         this.taskNo = incomingPacket.getTaskNo();
@@ -171,6 +177,7 @@ public class ReceivingTask extends Task {
     }
 
     public void guiFirst(String fileName, int nBytes) {
+        this.nBytes = nBytes;
         if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
             infoGUI.setTitleLabel("Download: " + fileName);
         }
@@ -179,6 +186,17 @@ public class ReceivingTask extends Task {
             this.nPackets = (nBytes / Protocol.maxDataSize) + 1;
         } else {
             this.nPackets = (nBytes / Protocol.maxDataSize) + 2;
+        }
+    }
+
+    public void fileTransmissionDone() {
+        this.endTask = System.currentTimeMillis();
+        long transmissionTime = endTask - beginTask;
+
+        if (getHost() instanceof Client && command.equals(Protocol.SENDDATA)) {
+            String line1 = nBytes + " bytes received in " + (transmissionTime/1000) + " seconds (" + (nBytes/(transmissionTime/1000)) + " bytes/sec)";
+            String message = line1;
+            infoGUI.setProgressLable(message);
         }
     }
 

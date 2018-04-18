@@ -98,15 +98,4 @@ public class Reactions {
             System.out.println(listOfFiles[i]);
         }
     }
-
-    public static void sendIP(Host host, InetAddress destinationIP, int destinationPort) {
-        InetAddress IP = host.getHostSocket().getInetAddress();
-        int port = host.getHostSocket().getPort();
-        String message = IP.toString() + Protocol.DELIMITER + port;
-        byte[] data = message.getBytes();
-
-        String command = Protocol.HELLOIP;
-        OutgoingData outgoingData = new OutgoingData(command, destinationIP, destinationPort, data, Protocol.WS);
-        host.getSendingWindow().addTask(outgoingData);
-    }
 }

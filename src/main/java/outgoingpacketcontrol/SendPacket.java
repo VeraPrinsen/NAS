@@ -81,7 +81,7 @@ public class SendPacket implements Runnable {
             }
             nTransmissions++;
 
-            if (packet.getCommand().equals(Protocol.ACK) || packet.getCommand().equals(Protocol.PAUSE) || packet.getCommand().equals(Protocol.RESUME)) {
+            if (packet.getCommand().equals(Protocol.ACK) || packet.getCommand().equals(Protocol.PAUSE) || packet.getCommand().equals(Protocol.RESUME) || packet.getCommand().equals(Protocol.UPLOAD_SAVED)) {
                 ackReceived = true;
             }
 

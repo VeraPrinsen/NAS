@@ -73,8 +73,15 @@ public class ReceivingWindow {
             }
         }
 
-        sendAck(incomingPacket);
+        if (!incomingPacket.getCommand().equals(Protocol.UPLOAD_SAVED)) {
+            sendAck(incomingPacket);
+        }
     }
+
+    public void fileTransmissionDone(int taskNo) {
+        getTask(taskNo).fileTransmissionDone();
+    }
+
 
     // SENDACK
     private void sendAck(IncomingPacket incomingPacket) {

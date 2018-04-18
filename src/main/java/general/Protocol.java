@@ -41,9 +41,6 @@ public class Protocol {
     public static final int HEADERSIZE = CHECKSUMSIZE + COMMANDSIZE + SEQUENCECMDSIZE + LAFSIZE + TASKSIZE + SEQUENCESIZE + DATASIZESIZE;
 
     // COMMANDS (2 bytes)
-    public static final String HELLO = "HL";
-    public static final String HELLOIP = "IP";
-
     public static final String DOWNLOAD = "DL";
     public static final String DOWNLOAD_APPROVED = "DA";
     public static final String DOWNLOAD_DENIED = "DD";

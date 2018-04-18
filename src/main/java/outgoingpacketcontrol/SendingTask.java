@@ -111,10 +111,6 @@ public class SendingTask extends Task implements Runnable {
             OutgoingPacket outgoingPacket = new OutgoingPacket(data, data.getTaskNo(), sequenceCmd, packet, j, data.getLAF());
             new Thread(new SendPacket(getHost(), this, outgoingPacket)).start();
         }
-
-        if (data.getCommand().equals(Protocol.HELLO)) {
-            getHost().setBroadCast(false);
-        }
     }
 
     public synchronized void setPacketSend() {

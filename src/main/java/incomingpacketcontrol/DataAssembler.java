@@ -32,21 +32,6 @@ public class DataAssembler implements Runnable {
         InetAddress sourceIP = packetList.get(0).getSourceIP();
         int sourcePort = packetList.get(0).getSourcePort();
         switch (command) {
-            case Protocol.HELLO:
-                if (Protocol.showInfo) {
-                    System.out.println(sourceIP.toString() + "/" + sourcePort + " | HELLO received");
-                }
-                Reactions.sendIP(host, sourceIP, sourcePort);
-                break;
-
-            case Protocol.HELLOIP:
-                byte[] byteData = packetList.get(0).getData();
-                String stringData = new String(byteData);
-                String[] dataArgs = stringData.split(Protocol.DELIMITER);
-                ((Client) host).setServerIP(dataArgs[0]);
-                ((Client) host).setServerPort(Integer.parseInt(dataArgs[1]));
-                break;
-
             case Protocol.DOWNLOAD:
                 if (Protocol.showInfo) {
                     System.out.println(sourceIP.toString() + "/" + sourcePort + " | DOWNLOAD: " +  new String(getDataArray(dataArray)) + " received");
@@ -122,7 +107,7 @@ public class DataAssembler implements Runnable {
                 if (host instanceof Server) {
                     Reactions.sendUploadSaved(host, packetList);
                 } else {
-                    host.getSendingWindow().fileTransmissionDone(packetList.get(0).getTaskNo());
+                    host.getReceivingWindow().fileTransmissionDone(packetList.get(0).getTaskNo());
                 }
                 break;
 

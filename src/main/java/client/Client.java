@@ -20,29 +20,9 @@ public class Client extends Host {
         super();
         this.clientTUI = new ClientTUI();
         createSocket(Protocol.DEFAULT_CLIENT_PORT);
-        setBroadCast(true);
         new Thread(new SocketListener(this)).start();
-
-        byte[] data = new byte[1];
-        data[0] = 0;
-        String command = Protocol.HELLO;
-        OutgoingData outgoingData = new OutgoingData(command, null, 0, data, Protocol.WS);
-        getSendingWindow().addTask(outgoingData);
-
-        //serverIP = Protocol.getDefaultIp();
-        //serverPort = Protocol.DEFAULT_SERVER_PORT;
-    }
-
-    public void setServerIP(String IP) {
-        try {
-            this.serverIP = InetAddress.getByName(IP);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setServerPort(int port) {
-        this.serverPort = port;
+        serverIP = Protocol.getDefaultIp();
+        serverPort = Protocol.DEFAULT_SERVER_PORT;
     }
 
     public InetAddress getServerIP() {

@@ -88,13 +88,4 @@ public class Host {
             e.printStackTrace();
         }
     }
-
-    public void setBroadCast(boolean doBroadcast) {
-        try {
-            hostSocket.setBroadcast(doBroadcast);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
